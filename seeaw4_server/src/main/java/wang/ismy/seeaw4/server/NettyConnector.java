@@ -6,54 +6,59 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import lombok.extern.slf4j.Slf4j;
 import wang.ismy.seeaw4.common.Connector;
 import wang.ismy.seeaw4.common.connection.Connection;
 import wang.ismy.seeaw4.common.connection.OnConnectionCloseListener;
 import wang.ismy.seeaw4.common.connection.OnConnectionEstablishListener;
-import wang.ismy.seeaw4.server.netty.NettyWebServerHandler;
+import wang.ismy.seeaw4.server.netty.NettyServerHandler;
 
-import javax.net.ServerSocketFactory;
 import java.util.List;
 
 /**
  * socket连接器
  * @author my
  */
+@Slf4j
 public class NettyConnector implements Connector {
 
     private OnConnectionEstablishListener establishListener;
     private OnConnectionCloseListener closeListener;
     private ExecuteService executeService = ExecuteService.getInstance();
+    private NettyServerHandler handler = NettyServerHandler.getInstance();
 
     public NettyConnector() {
-        NioEventLoopGroup mainGroup = new NioEventLoopGroup();
-        NioEventLoopGroup subGroup = new NioEventLoopGroup();
-        try{
+        executeService.excute(()->{
+            NioEventLoopGroup mainGroup = new NioEventLoopGroup();
+            NioEventLoopGroup subGroup = new NioEventLoopGroup();
+            try{
 
-            // 启动对象
-            ServerBootstrap serverBootstrap = new ServerBootstrap();
+                // 启动对象
+                ServerBootstrap serverBootstrap = new ServerBootstrap();
 
-            serverBootstrap
-                    .group(mainGroup,subGroup)
-                    // 通道类型
-                    .channel(NioServerSocketChannel.class)
-                    // 业务处理
-                    .childHandler(new ChannelInitializer<>() {
-                        @Override
-                        protected void initChannel(Channel channel) throws Exception {
-                            channel.pipeline().addLast(new NettyWebServerHandler());
-                        }
-                    });
-            ChannelFuture sync = serverBootstrap.bind(9090).sync();
-
-            // 等待关闭
-            sync.channel().closeFuture().sync();
-        }catch (Exception e){
-            e.printStackTrace();
-        }finally {
-            mainGroup.shutdownGracefully();
-            subGroup.shutdownGracefully();
-        }
+                serverBootstrap
+                        .group(mainGroup,subGroup)
+                        // 通道类型
+                        .channel(NioServerSocketChannel.class)
+                        // 业务处理
+                        .childHandler(new ChannelInitializer<>() {
+                            @Override
+                            protected void initChannel(Channel channel) throws Exception {
+                                channel.pipeline().addLast(handler);
+                            }
+                        });
+                ChannelFuture sync = serverBootstrap.bind(1999).sync();
+                log.info("netty服务器启动成功");
+                // 等待关闭
+                sync.channel().closeFuture().sync();
+            }catch (Exception e){
+                log.error("netty服务器发生错误,{}",e.getMessage());
+                e.printStackTrace();
+            }finally {
+                mainGroup.shutdownGracefully();
+                subGroup.shutdownGracefully();
+            }
+        });
     }
 
     @Override
