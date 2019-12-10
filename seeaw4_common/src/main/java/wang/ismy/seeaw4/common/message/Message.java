@@ -1,4 +1,4 @@
-package wang.ismy.seeaw4.common;
+package wang.ismy.seeaw4.common.message;
 
 import java.io.Serializable;
 

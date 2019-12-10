@@ -2,10 +2,10 @@ package wang.ismy.seeaw4.server.netty;
 
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
-import wang.ismy.seeaw4.common.Message;
+import wang.ismy.seeaw4.common.message.Message;
 import wang.ismy.seeaw4.common.connection.Connection;
 import wang.ismy.seeaw4.common.connection.ConnectionInfo;
-import wang.ismy.seeaw4.common.listener.MessageListener;
+import wang.ismy.seeaw4.common.message.MessageListener;
 
 import java.io.IOException;
 import java.util.Objects;

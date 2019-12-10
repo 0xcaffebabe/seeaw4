@@ -6,6 +6,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.timeout.IdleStateHandler;
 import lombok.extern.slf4j.Slf4j;
 import wang.ismy.seeaw4.common.Connector;
 import wang.ismy.seeaw4.common.ExecuteService;
@@ -17,6 +18,7 @@ import wang.ismy.seeaw4.server.netty.NettyConnectionService;
 import wang.ismy.seeaw4.server.netty.NettyServerHandler;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * socket连接器
@@ -45,11 +47,14 @@ public class NettyConnector implements Connector, ChannelListener {
                         .group(mainGroup,subGroup)
                         // 通道类型
                         .channel(NioServerSocketChannel.class)
+
                         // 业务处理
                         .childHandler(new ChannelInitializer<>() {
                             @Override
                             protected void initChannel(Channel channel) throws Exception {
-                                channel.pipeline().addLast(nettyServerHandler);
+                                channel.pipeline()
+                                        .addLast(new IdleStateHandler(5,10,15, TimeUnit.SECONDS))
+                                        .addLast(nettyServerHandler);
                             }
                         });
                 ChannelFuture sync = serverBootstrap.bind(1999).sync();

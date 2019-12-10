@@ -1,6 +1,4 @@
-package wang.ismy.seeaw4.common.listener;
-
-import wang.ismy.seeaw4.common.Message;
+package wang.ismy.seeaw4.common.message;
 
 /**
  * 消息到达监听器

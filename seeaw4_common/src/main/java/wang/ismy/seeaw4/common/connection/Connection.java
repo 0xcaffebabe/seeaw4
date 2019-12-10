@@ -1,7 +1,7 @@
 package wang.ismy.seeaw4.common.connection;
 
-import wang.ismy.seeaw4.common.Message;
-import wang.ismy.seeaw4.common.listener.MessageListener;
+import wang.ismy.seeaw4.common.message.Message;
+import wang.ismy.seeaw4.common.message.MessageListener;
 
 import java.io.IOException;
 

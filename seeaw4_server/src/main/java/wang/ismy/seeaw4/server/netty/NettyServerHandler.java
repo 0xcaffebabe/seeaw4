@@ -1,9 +1,7 @@
 package wang.ismy.seeaw4.server.netty;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandlerAdapter;
-import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.*;
 import io.netty.util.CharsetUtil;
 import lombok.extern.slf4j.Slf4j;
 import wang.ismy.seeaw4.common.connection.Connection;
@@ -19,7 +17,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author my
  */
 @Slf4j
-public class NettyServerHandler extends ChannelHandlerAdapter {
+@ChannelHandler.Sharable
+public class NettyServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
     private static final NettyServerHandler INSTANCE = new NettyServerHandler();
     private List<Channel> channelList = new LinkedList<>();
     private ChannelListener channelListener;
@@ -66,12 +65,14 @@ public class NettyServerHandler extends ChannelHandlerAdapter {
      * @throws Exception
      */
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+    protected void messageReceived(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
         Channel channel = ctx.channel();
         ByteBuf buf = (ByteBuf) msg;
         String textMsg = buf.toString(CharsetUtil.UTF_8);
         log.info("{}消息到达:{}",channel.remoteAddress(),textMsg);
     }
+
+
 
     public static NettyServerHandler getInstance(){
         return INSTANCE;
@@ -80,7 +81,6 @@ public class NettyServerHandler extends ChannelHandlerAdapter {
     public List<Channel> getChannelList(){
         return channelList;
     }
-
 
     public void setChannelListener(ChannelListener channelListener) {
         this.channelListener = channelListener;
