@@ -5,7 +5,7 @@ import io.netty.channel.Channel;
 import wang.ismy.seeaw4.common.Message;
 import wang.ismy.seeaw4.common.connection.Connection;
 import wang.ismy.seeaw4.common.connection.ConnectionInfo;
-import wang.ismy.seeaw4.common.listener.OnMessageArrivalListener;
+import wang.ismy.seeaw4.common.listener.MessageListener;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -39,7 +39,7 @@ public class NettyConnection implements Connection {
     }
 
     @Override
-    public void bindMessageArrivalListener(OnMessageArrivalListener listener) {
+    public void bindMessageListener(MessageListener listener) {
 
     }
 

@@ -15,27 +15,11 @@ import wang.ismy.seeaw4.common.ExecuteService;
  */
 public class NettyClient {
 
-    private ExecuteService executeService = ExecuteService.getInstance();
+
 
     public NettyClient() {
-        executeService.excute(()->{
-            NioEventLoopGroup group = new NioEventLoopGroup();
-            Bootstrap bootstrap = new Bootstrap();
-            bootstrap.group(group)
-                    .channel(NioSocketChannel.class)
-                    .handler(new ChannelInitializer<SocketChannel>() {
-                        @Override
-                        protected void initChannel(SocketChannel ch) throws Exception {
-                            //ch.pipeline().addLast(new ClientHandler());
-                        }
-                    });
-            ChannelFuture future = null;
-            try {
-                future = bootstrap.connect("127.0.0.1", 1999).sync();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            Channel channel = future.channel();
-        });
+
+
+
     }
 }

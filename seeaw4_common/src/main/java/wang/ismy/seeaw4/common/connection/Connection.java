@@ -1,7 +1,7 @@
 package wang.ismy.seeaw4.common.connection;
 
 import wang.ismy.seeaw4.common.Message;
-import wang.ismy.seeaw4.common.listener.OnMessageArrivalListener;
+import wang.ismy.seeaw4.common.listener.MessageListener;
 
 import java.io.IOException;
 
@@ -35,5 +35,5 @@ public interface Connection extends AutoCloseable{
 	 * 向该连接绑定一个消息到达监听
 	 * @param listener 消息监听对象
 	 */
-	void bindMessageArrivalListener(OnMessageArrivalListener listener);
+	void bindMessageListener(MessageListener listener);
 }
