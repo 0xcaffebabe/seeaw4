@@ -8,9 +8,12 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.extern.slf4j.Slf4j;
 import wang.ismy.seeaw4.common.Connector;
+import wang.ismy.seeaw4.common.ExecuteService;
 import wang.ismy.seeaw4.common.connection.Connection;
-import wang.ismy.seeaw4.common.connection.OnConnectionCloseListener;
-import wang.ismy.seeaw4.common.connection.OnConnectionEstablishListener;
+import wang.ismy.seeaw4.common.connection.ConnectionListener;
+import wang.ismy.seeaw4.server.netty.ChannelListener;
+import wang.ismy.seeaw4.server.netty.NettyConnection;
+import wang.ismy.seeaw4.server.netty.NettyConnectionService;
 import wang.ismy.seeaw4.server.netty.NettyServerHandler;
 
 import java.util.List;
@@ -20,19 +23,21 @@ import java.util.List;
  * @author my
  */
 @Slf4j
-public class NettyConnector implements Connector {
+public class NettyConnector implements Connector, ChannelListener {
 
-    private OnConnectionEstablishListener establishListener;
-    private OnConnectionCloseListener closeListener;
+    private ConnectionListener connectionListener;
     private ExecuteService executeService = ExecuteService.getInstance();
-    private NettyServerHandler handler = NettyServerHandler.getInstance();
+    private NettyServerHandler nettyServerHandler = NettyServerHandler.getInstance();
+    private NettyConnectionService nettyConnectionService = NettyConnectionService.getInstance();
 
     public NettyConnector() {
+        // 监听handler的连接建立与关闭
+        nettyServerHandler.setChannelListener(this);
+        // 启动netty服务器
         executeService.excute(()->{
             NioEventLoopGroup mainGroup = new NioEventLoopGroup();
             NioEventLoopGroup subGroup = new NioEventLoopGroup();
             try{
-
                 // 启动对象
                 ServerBootstrap serverBootstrap = new ServerBootstrap();
 
@@ -44,7 +49,7 @@ public class NettyConnector implements Connector {
                         .childHandler(new ChannelInitializer<>() {
                             @Override
                             protected void initChannel(Channel channel) throws Exception {
-                                channel.pipeline().addLast(handler);
+                                channel.pipeline().addLast(nettyServerHandler);
                             }
                         });
                 ChannelFuture sync = serverBootstrap.bind(1999).sync();
@@ -61,18 +66,25 @@ public class NettyConnector implements Connector {
         });
     }
 
-    @Override
-    public void bindConnectListener(OnConnectionEstablishListener listener) {
-        establishListener = listener;
-    }
 
     @Override
-    public void bindDisconnectListener(OnConnectionCloseListener listener) {
-        closeListener = listener;
+    public void bindConnectionListener(ConnectionListener connectionListener) {
+        this.connectionListener = connectionListener;
     }
 
     @Override
     public List<Connection> getConnectionList() {
-        return null;
+        return nettyConnectionService.getConnectionList();
+    }
+
+    @Override
+    public void channelActive(Channel channel) throws Exception {
+        Connection connection = new NettyConnection(channel);
+        nettyConnectionService.add(channel,connection);
+    }
+
+    @Override
+    public void channelInactive(Channel channel) throws Exception {
+        nettyConnectionService.remove(channel);
     }
 }

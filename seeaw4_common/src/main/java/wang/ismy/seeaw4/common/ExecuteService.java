@@ -1,4 +1,4 @@
-package wang.ismy.seeaw4.server;
+package wang.ismy.seeaw4.common;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

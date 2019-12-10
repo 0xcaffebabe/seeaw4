@@ -1,8 +1,7 @@
 package wang.ismy.seeaw4.common;
 
 import wang.ismy.seeaw4.common.connection.Connection;
-import wang.ismy.seeaw4.common.connection.OnConnectionCloseListener;
-import wang.ismy.seeaw4.common.connection.OnConnectionEstablishListener;
+import wang.ismy.seeaw4.common.connection.ConnectionListener;
 
 import java.util.List;
 
@@ -13,16 +12,10 @@ import java.util.List;
 public interface Connector {
 
 	/**
-	 * 绑定连接事件
-	 * @param listener　连接建立监听器
+	 * 绑定连接监听器
+	 * @param connectionListener
 	 */
-	void bindConnectListener(OnConnectionEstablishListener listener);
-
-	/**
-	 * 绑定连接断开事件
-	 * @param listener　连接断开监听器
-	 */
-	void bindDisconnectListener(OnConnectionCloseListener listener);
+	void bindConnectionListener(ConnectionListener connectionListener);
 
 	/**
 	 * 获取所有连接

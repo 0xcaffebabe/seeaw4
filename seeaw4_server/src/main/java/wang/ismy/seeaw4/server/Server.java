@@ -9,7 +9,6 @@ public class Server {
 	
 	private Connector connector  = new NettyConnector();
 
-
 	public static void main(String[] args) {
 		Server server = new Server();
 
