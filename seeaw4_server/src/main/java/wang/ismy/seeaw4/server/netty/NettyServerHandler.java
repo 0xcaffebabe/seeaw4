@@ -5,6 +5,8 @@ import io.netty.channel.*;
 import io.netty.util.CharsetUtil;
 import lombok.extern.slf4j.Slf4j;
 import wang.ismy.seeaw4.common.connection.Connection;
+import wang.ismy.seeaw4.common.message.Message;
+import wang.ismy.seeaw4.common.message.MessageService;
 
 import java.lang.annotation.ElementType;
 import java.util.LinkedList;
@@ -22,6 +24,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
     private static final NettyServerHandler INSTANCE = new NettyServerHandler();
     private List<Channel> channelList = new LinkedList<>();
     private ChannelListener channelListener;
+    private MessageService messageService = new MessageService();
 
     private NettyServerHandler() { }
 
@@ -67,12 +70,9 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
     @Override
     protected void messageReceived(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
         Channel channel = ctx.channel();
-        ByteBuf buf = (ByteBuf) msg;
-        String textMsg = buf.toString(CharsetUtil.UTF_8);
-        log.info("{}消息到达:{}",channel.remoteAddress(),textMsg);
+        Message message = messageService.resolve(msg.array());
+        log.info("{}消息到达:{}",channel.remoteAddress(), message);
     }
-
-
 
     public static NettyServerHandler getInstance(){
         return INSTANCE;

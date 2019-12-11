@@ -1,11 +1,13 @@
 package wang.ismy.seeaw4.client.netty;
 
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
 
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
 /**
@@ -13,7 +15,7 @@ import java.nio.ByteBuffer;
  */
 @ChannelHandler.Sharable
 @Slf4j
-public class NettyClientHandler extends SimpleChannelInboundHandler<ByteBuffer> {
+public class NettyClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     private static NettyClientHandler INSTANCE = new NettyClientHandler();
     private NettyClientConnection connection;
@@ -32,16 +34,18 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<ByteBuffer> 
         }
     }
 
-    @Override
-    protected void messageReceived(ChannelHandlerContext ctx, ByteBuffer msg) throws Exception {
-
-    }
-
     public static NettyClientHandler getInstance(){
         return INSTANCE;
     }
 
     public void setNettyConnection(NettyClientConnection connection){
         this.connection = connection;
+    }
+
+    @Override
+    protected void messageReceived(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
+        if (connection != null){
+            connection.onMessage(msg);
+        }
     }
 }

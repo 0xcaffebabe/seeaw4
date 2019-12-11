@@ -29,16 +29,18 @@ public class NettyConnectionService {
         add(channel,connection);
     }
 
-    public void remove(Channel channel){
+    public Connection remove(Channel channel){
         Connection connection = channelConnectionMap.get(channel);
         channelConnectionMap.remove(channel);
         connectionChannelMap.remove(connection);
+        return connection;
     }
 
-    public void remove(Connection connection){
+    public Channel remove(Connection connection){
         Channel channel = connectionChannelMap.get(connection);
         connectionChannelMap.remove(connection);
         channelConnectionMap.remove(channel);
+        return channel;
     }
 
     public static NettyConnectionService getInstance(){

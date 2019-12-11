@@ -6,8 +6,10 @@ import wang.ismy.seeaw4.common.message.Message;
 import wang.ismy.seeaw4.common.connection.Connection;
 import wang.ismy.seeaw4.common.connection.ConnectionInfo;
 import wang.ismy.seeaw4.common.message.MessageListener;
+import wang.ismy.seeaw4.common.message.MessageService;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -18,7 +20,7 @@ public class NettyConnection implements Connection {
 
     private final Channel channel;
     private final ConnectionInfo connectionInfo;
-
+    private MessageService messageService = new MessageService();
     public NettyConnection(Channel channel) {
         this.channel = channel;
         connectionInfo =
@@ -35,7 +37,10 @@ public class NettyConnection implements Connection {
 
     @Override
     public void sendMessage(Message message) throws IOException {
-        channel.writeAndFlush(Unpooled.wrappedBuffer(message.getPayload()));
+        byte[] build = messageService.build(message);
+        System.out.println(Arrays.toString(build));
+        channel.writeAndFlush(Unpooled.wrappedBuffer(build));
+
     }
 
     @Override

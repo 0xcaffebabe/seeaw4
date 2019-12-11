@@ -86,10 +86,18 @@ public class NettyConnector implements Connector, ChannelListener {
     public void channelActive(Channel channel) throws Exception {
         Connection connection = new NettyConnection(channel);
         nettyConnectionService.add(channel,connection);
+        // 通知监听器
+        if (connectionListener != null){
+            connectionListener.establish(connection);
+        }
     }
 
     @Override
     public void channelInactive(Channel channel) throws Exception {
-        nettyConnectionService.remove(channel);
+        Connection connection = nettyConnectionService.remove(channel);
+        // 通知监听器
+        if (connectionListener != null){
+            connectionListener.close(connection);
+        }
     }
 }

@@ -5,7 +5,6 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import wang.ismy.seeaw4.common.utils.BytesUtils;
 
-import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -56,8 +55,7 @@ public class MessageService {
         byte[] payload = BytesUtils.subBytes(bytes, offsetInt+8, bytes.length - offsetInt-8);
         MessageType messageType = MessageType.valueOf(byteArrayToInt(type));
         Map map = gson.fromJson(new String(additions), Map.class);
-        Message message = messageType.getMessageConverter().convert(payload, map);
-        return message;
+        return messageType.getMessageConverter().convert(payload, map);
     }
 
     private static byte[] intToByte4(int i) {

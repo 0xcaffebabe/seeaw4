@@ -57,4 +57,12 @@ public class TextMessage implements Message {
         result = 31 * result + Arrays.hashCode(payload);
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "TextMessage{" +
+                "payload=" + new String(payload) +
+                ", additions=" + additions +
+                '}';
+    }
 }

@@ -1,6 +1,7 @@
 package wang.ismy.seeaw4.client.netty;
 
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -13,9 +14,11 @@ import wang.ismy.seeaw4.common.message.Message;
 import wang.ismy.seeaw4.common.connection.Connection;
 import wang.ismy.seeaw4.common.connection.ConnectionInfo;
 import wang.ismy.seeaw4.common.message.MessageListener;
+import wang.ismy.seeaw4.common.message.MessageService;
 import wang.ismy.seeaw4.common.message.impl.TextMessage;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -33,6 +36,7 @@ public class NettyClientConnection implements Connection {
     private String ip;
     private int port;
     private final NettyClientHandler nettyClientHandler = NettyClientHandler.getInstance();
+    private final MessageService messageService = new MessageService();
 
     public NettyClientConnection(String ip, int port) {
         nettyClientHandler.setNettyConnection(this);
@@ -87,5 +91,11 @@ public class NettyClientConnection implements Connection {
     @Override
     public void bindMessageListener(MessageListener listener) {
         messageListener = listener;
+    }
+
+    public void onMessage(ByteBuf buf){
+
+        Message message = messageService.resolve(buf.readBytes(buf.readableBytes()).array());
+        log.info("接受到消息:{}",message);
     }
 }
