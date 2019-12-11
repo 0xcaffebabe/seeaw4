@@ -1,0 +1,37 @@
+package wang.ismy.seeaw4.common.message;
+
+import org.junit.Test;
+import org.mockito.Mockito;
+import wang.ismy.seeaw4.common.message.impl.TextMessage;
+
+import java.util.Map;
+
+import static org.junit.Assert.*;
+
+public class MessageServiceTest {
+
+    @Test
+    public void build() {
+        MessageService messageService = new MessageService();
+        Message mockMsg = Mockito.mock(Message.class);
+        Mockito.when(mockMsg.getPayload())
+                .thenReturn(new byte[]{1,1});
+        Mockito.when(mockMsg.addition())
+                .thenReturn(null);
+        Mockito.when(mockMsg.messageType())
+                .thenReturn(MessageType.TEXT);
+        // 前4个字节代表消息类型　5-8个字节代表附加消息偏移量　9-偏移量+1代表附加消息　最后一部分是有效载荷
+        byte[] expectedBytes = new byte[]{0,0,0,0,0,0,0,0,1,1};
+        byte[] build = messageService.build(mockMsg);
+        assertArrayEquals(expectedBytes,build);
+    }
+
+    @Test
+    public void resolve(){
+        MessageService messageService = new MessageService();
+        Message msg = new TextMessage("text", Map.of("name","july"));
+        byte[] build = messageService.build(msg);
+        Message resolve = messageService.resolve(build);
+        assertTrue(resolve.equals(msg));
+    }
+}
