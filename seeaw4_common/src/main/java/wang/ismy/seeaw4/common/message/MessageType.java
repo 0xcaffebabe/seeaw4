@@ -1,6 +1,7 @@
 package wang.ismy.seeaw4.common.message;
 
 import wang.ismy.seeaw4.common.message.converter.MessageConverter;
+import wang.ismy.seeaw4.common.message.converter.MessageConverterFactory;
 import wang.ismy.seeaw4.common.message.converter.impl.TextMessageConverter;
 
 /**
@@ -9,18 +10,20 @@ import wang.ismy.seeaw4.common.message.converter.impl.TextMessageConverter;
  */
 
 public enum MessageType {
+
     /**
      * 文本消息
      */
-    TEXT(0,new TextMessageConverter()),
+    TEXT(0,MessageConverterFactory.textMessageConverter()),
 
     /**
      * 图片消息
      */
-    IMG(1,null);
+    IMG(1,MessageConverterFactory.imgMessageConverter());
 
     private int code;
     private MessageConverter messageConverter;
+
 
     MessageType(int code,MessageConverter messageConverter){
         this.code = code;

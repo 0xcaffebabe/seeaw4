@@ -29,6 +29,14 @@ public class NettyConnectionService {
         add(channel,connection);
     }
 
+    public Connection get(Channel channel){
+        return channelConnectionMap.get(channel);
+    }
+
+    public Channel get(Connection connection){
+        return connectionChannelMap.get(connection);
+    }
+
     public Connection remove(Channel channel){
         Connection connection = channelConnectionMap.get(channel);
         channelConnectionMap.remove(channel);
@@ -43,15 +51,15 @@ public class NettyConnectionService {
         return channel;
     }
 
-    public static NettyConnectionService getInstance(){
-        return INSTANCE;
-    }
-
     public List<Connection> getConnectionList(){
         return new ArrayList<>(connectionChannelMap.keySet());
     }
 
     public List<Channel> getChannelList(){
         return new ArrayList<>(channelConnectionMap.keySet());
+    }
+
+    public static NettyConnectionService getInstance(){
+        return INSTANCE;
     }
 }

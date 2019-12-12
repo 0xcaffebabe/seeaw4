@@ -15,6 +15,7 @@ import wang.ismy.seeaw4.common.connection.Connection;
 import wang.ismy.seeaw4.common.connection.ConnectionInfo;
 import wang.ismy.seeaw4.common.message.MessageListener;
 import wang.ismy.seeaw4.common.message.MessageService;
+import wang.ismy.seeaw4.common.message.chain.impl.PrintMessageChain;
 import wang.ismy.seeaw4.common.message.impl.TextMessage;
 
 import java.io.IOException;
@@ -36,9 +37,10 @@ public class NettyClientConnection implements Connection {
     private String ip;
     private int port;
     private final NettyClientHandler nettyClientHandler = NettyClientHandler.getInstance();
-    private final MessageService messageService = new MessageService();
+    private final MessageService messageService = MessageService.getInstance();
 
     public NettyClientConnection(String ip, int port) {
+        messageService.registerMessageChain(new PrintMessageChain());
         nettyClientHandler.setNettyConnection(this);
         this.ip = ip;
         this.port = port;
@@ -64,6 +66,8 @@ public class NettyClientConnection implements Connection {
                     log.info("连接不上服务器,{}ms后重试", NEXT_RETRY_DELAY);
                     connect();
                 }, NEXT_RETRY_DELAY, TimeUnit.MILLISECONDS);
+            }else{
+
             }
         });
     }
@@ -85,7 +89,8 @@ public class NettyClientConnection implements Connection {
 
     @Override
     public void sendMessage(Message message) throws IOException {
-        channel.writeAndFlush(Unpooled.wrappedBuffer(message.getPayload()));
+        channel.writeAndFlush(
+                Unpooled.wrappedBuffer(message.getPayload()));
     }
 
     @Override
@@ -94,8 +99,7 @@ public class NettyClientConnection implements Connection {
     }
 
     public void onMessage(ByteBuf buf){
-
         Message message = messageService.resolve(buf.readBytes(buf.readableBytes()).array());
-        log.info("接受到消息:{}",message);
+        messageService.process(this,message);
     }
 }

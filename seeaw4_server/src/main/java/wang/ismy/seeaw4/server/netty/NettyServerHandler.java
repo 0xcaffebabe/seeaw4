@@ -6,7 +6,9 @@ import io.netty.util.CharsetUtil;
 import lombok.extern.slf4j.Slf4j;
 import wang.ismy.seeaw4.common.connection.Connection;
 import wang.ismy.seeaw4.common.message.Message;
+import wang.ismy.seeaw4.common.message.MessageListener;
 import wang.ismy.seeaw4.common.message.MessageService;
+import wang.ismy.seeaw4.common.message.chain.impl.PrintMessageChain;
 
 import java.lang.annotation.ElementType;
 import java.util.LinkedList;
@@ -24,7 +26,9 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
     private static final NettyServerHandler INSTANCE = new NettyServerHandler();
     private List<Channel> channelList = new LinkedList<>();
     private ChannelListener channelListener;
-    private MessageService messageService = new MessageService();
+    private MessageService messageService = MessageService.getInstance();
+    private NettyConnectionService connectionService = NettyConnectionService.getInstance();
+    private MessageListener messageListener;
 
     private NettyServerHandler() { }
 
@@ -71,7 +75,10 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
     protected void messageReceived(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
         Channel channel = ctx.channel();
         Message message = messageService.resolve(msg.array());
-        log.info("{}消息到达:{}",channel.remoteAddress(), message);
+        // 通知监听者
+        if (messageListener != null){
+            messageListener.onMessage(connectionService.get(channel),message);
+        }
     }
 
     public static NettyServerHandler getInstance(){
@@ -84,5 +91,9 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     public void setChannelListener(ChannelListener channelListener) {
         this.channelListener = channelListener;
+    }
+
+    public void setMessageListener(MessageListener messageListener) {
+        this.messageListener = messageListener;
     }
 }

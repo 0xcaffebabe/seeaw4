@@ -16,11 +16,13 @@ import java.util.Objects;
  * netty通道连接
  * @author my
  */
-public class NettyConnection implements Connection {
+public class NettyConnection implements Connection{
 
     private final Channel channel;
     private final ConnectionInfo connectionInfo;
-    private MessageService messageService = new MessageService();
+    private MessageService messageService =  MessageService.getInstance();
+    private MessageListener messageListener;
+
     public NettyConnection(Channel channel) {
         this.channel = channel;
         connectionInfo =
@@ -45,7 +47,7 @@ public class NettyConnection implements Connection {
 
     @Override
     public void bindMessageListener(MessageListener listener) {
-
+        this.messageListener = listener;
     }
 
     @Override
@@ -65,4 +67,5 @@ public class NettyConnection implements Connection {
     public int hashCode() {
         return Objects.hash(channel, connectionInfo);
     }
+
 }

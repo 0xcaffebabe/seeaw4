@@ -3,8 +3,14 @@ package wang.ismy.seeaw4.common.message;
 import ch.qos.logback.core.encoder.ByteArrayUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import lombok.extern.slf4j.Slf4j;
+import wang.ismy.seeaw4.common.connection.Connection;
+import wang.ismy.seeaw4.common.message.chain.MessageChain;
 import wang.ismy.seeaw4.common.utils.BytesUtils;
 
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,9 +22,23 @@ import java.util.Map;
  *
  * @author my
  */
+@Slf4j
 public class MessageService {
+    private static final MessageService INSTANCE = new MessageService();
     private Gson gson = new Gson();
+    private List<MessageChain> messageChainList = new LinkedList<>();
 
+    private MessageService(){}
+
+    public void registerMessageChain(MessageChain messageChain){
+        messageChainList.add(messageChain);
+    }
+
+    /**
+     * 将一条消息转化为字节数组
+     * @param message 消息
+     * @return 字节数组
+     */
     public byte[] build(Message message) {
         byte[] type = intToByte4(message.messageType().getCode());
         byte[] offset;
@@ -47,6 +67,11 @@ public class MessageService {
         return ret;
     }
 
+    /**
+     * 将一个字节数组转化为消息
+     * @param bytes 字节数
+     * @return 消息
+     */
     public Message resolve(byte[] bytes) {
         byte[] type = BytesUtils.subBytes(bytes, 0, 4);
         byte[] offset = BytesUtils.subBytes(bytes, 4, 4);
@@ -56,6 +81,26 @@ public class MessageService {
         MessageType messageType = MessageType.valueOf(byteArrayToInt(type));
         Map map = gson.fromJson(new String(additions), Map.class);
         return messageType.getMessageConverter().convert(payload, map);
+    }
+
+    /**
+     * 交由系统的消息处理链处理消息
+     * @param connection
+     * @param message
+     */
+    public void process(Connection connection,Message message){
+        for (MessageChain messageChain : messageChainList) {
+            try {
+                messageChain.process(connection,message);
+            } catch (IOException e) {
+                log.info("消息链发生异常,{}",e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static MessageService getInstance(){
+        return INSTANCE;
     }
 
     private static byte[] intToByte4(int i) {
@@ -73,5 +118,6 @@ public class MessageService {
                 (b[1] & 0xFF) << 16 |
                 (b[0] & 0xFF) << 24;
     }
+
 
 }

@@ -12,7 +12,7 @@ public class MessageServiceTest {
 
     @Test
     public void build() {
-        MessageService messageService = new MessageService();
+        MessageService messageService = MessageService.getInstance();
         Message mockMsg = Mockito.mock(Message.class);
         Mockito.when(mockMsg.getPayload())
                 .thenReturn(new byte[]{1,1});
@@ -28,7 +28,7 @@ public class MessageServiceTest {
 
     @Test
     public void resolve(){
-        MessageService messageService = new MessageService();
+        MessageService messageService = MessageService.getInstance();
         Message msg = new TextMessage("text", Map.of("name","july"));
         byte[] build = messageService.build(msg);
         Message resolve = messageService.resolve(build);

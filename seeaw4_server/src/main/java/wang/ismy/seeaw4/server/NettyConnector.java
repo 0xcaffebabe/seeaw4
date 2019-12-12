@@ -7,11 +7,15 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
+import jdk.dynalink.linker.TypeBasedGuardingDynamicLinker;
 import lombok.extern.slf4j.Slf4j;
 import wang.ismy.seeaw4.common.Connector;
 import wang.ismy.seeaw4.common.ExecuteService;
 import wang.ismy.seeaw4.common.connection.Connection;
 import wang.ismy.seeaw4.common.connection.ConnectionListener;
+import wang.ismy.seeaw4.common.message.Message;
+import wang.ismy.seeaw4.common.message.MessageListener;
+import wang.ismy.seeaw4.common.message.MessageService;
 import wang.ismy.seeaw4.server.netty.ChannelListener;
 import wang.ismy.seeaw4.server.netty.NettyConnection;
 import wang.ismy.seeaw4.server.netty.NettyConnectionService;
@@ -25,16 +29,20 @@ import java.util.concurrent.TimeUnit;
  * @author my
  */
 @Slf4j
-public class NettyConnector implements Connector, ChannelListener {
+public class NettyConnector implements Connector, ChannelListener, MessageListener {
 
     private ConnectionListener connectionListener;
     private ExecuteService executeService = ExecuteService.getInstance();
     private NettyServerHandler nettyServerHandler = NettyServerHandler.getInstance();
     private NettyConnectionService nettyConnectionService = NettyConnectionService.getInstance();
+    private MessageService messageService = MessageService.getInstance();
+
 
     public NettyConnector() {
         // 监听handler的连接建立与关闭
         nettyServerHandler.setChannelListener(this);
+        // 监听消息
+        nettyServerHandler.setMessageListener(this);
         // 启动netty服务器
         executeService.excute(()->{
             NioEventLoopGroup mainGroup = new NioEventLoopGroup();
@@ -99,5 +107,10 @@ public class NettyConnector implements Connector, ChannelListener {
         if (connectionListener != null){
             connectionListener.close(connection);
         }
+    }
+
+    @Override
+    public void onMessage(Connection connection,Message message) {
+        messageService.process(connection,message);
     }
 }
