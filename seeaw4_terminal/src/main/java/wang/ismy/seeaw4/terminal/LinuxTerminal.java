@@ -15,37 +15,43 @@ public class LinuxTerminal {
     private final OutputStream outputStream;
 
     public LinuxTerminal() throws IOException {
-        Runtime runtime = Runtime.getRuntime();
-        ProcessBuilder processBuilder = new ProcessBuilder().command("sh");
-        processBuilder.redirectError();
+        ProcessBuilder processBuilder = new ProcessBuilder()
+                .command("bash")
+                .redirectErrorStream(true);
         process = processBuilder.start();
         inputStream = process.getInputStream();
         outputStream = process.getOutputStream();
     }
 
-    public void run(){
+    public void run() {
         new Thread(new Runnable() {
             @Override
             public void run() {
-
-                while (true){
-                    try {
-                        System.out.write(inputStream.read());
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                int i = -1;
+                try {
+                    while ((i = inputStream.read()) != -1) {
+                        System.out.write(i);
                     }
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         }).start();
-        Scanner scanner =new Scanner(System.in);
-        while (scanner.hasNext()){
-            try {
-                outputStream.write((scanner.nextLine()+"\n").getBytes());
-                outputStream.flush();
-            } catch (IOException e) {
-                e.printStackTrace();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                int i = -1;
+                try {
+                    while ((i = System.in.read()) != -1) {
+                        outputStream.write(i);
+                        outputStream.flush();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-        }
+        }).start();
 
     }
 
