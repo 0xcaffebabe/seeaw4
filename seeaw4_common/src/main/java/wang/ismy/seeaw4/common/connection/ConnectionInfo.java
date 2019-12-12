@@ -20,7 +20,6 @@ public class ConnectionInfo {
      */
     private final InetSocketAddress socketAddress;
 
-
     /**
      * 连接时间
      */

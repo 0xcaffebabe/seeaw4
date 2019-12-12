@@ -36,19 +36,18 @@ public class NettyClientConnection implements Connection {
     private MessageListener messageListener;
     private String ip;
     private int port;
-    private final NettyClientHandler nettyClientHandler = NettyClientHandler.getInstance();
+    private NettyClientHandler nettyClientHandler;
     private final MessageService messageService = MessageService.getInstance();
+    private NioEventLoopGroup group;
 
     public NettyClientConnection(String ip, int port) {
-        messageService.registerMessageChain(new PrintMessageChain());
-        nettyClientHandler.setNettyConnection(this);
+        nettyClientHandler = new NettyClientHandler(this);
         this.ip = ip;
         this.port = port;
     }
 
     public void connect() {
-        NioEventLoopGroup group = new NioEventLoopGroup();
-
+        group = new NioEventLoopGroup();
         Bootstrap bootstrap = new Bootstrap();
         bootstrap.group(group)
                 .channel(NioSocketChannel.class)
@@ -67,19 +66,16 @@ public class NettyClientConnection implements Connection {
                     log.info("连接不上服务器,{}ms后重试", NEXT_RETRY_DELAY);
                     connect();
                 }, NEXT_RETRY_DELAY, TimeUnit.MILLISECONDS);
-            }else{
-
+            }else {
+                connectionInfo = new ConnectionInfo(channel.remoteAddress(),System.currentTimeMillis());
             }
         });
     }
 
-    public NettyClientConnection(Channel channel) {
-        this.channel = channel;
-        connectionInfo = new ConnectionInfo(channel.remoteAddress(), System.currentTimeMillis());
-    }
-
     @Override
     public void close() throws IOException {
+        group.shutdownGracefully();
+        nettyClientHandler.setInitClose(true);
         channel.close();
     }
 
@@ -100,8 +96,12 @@ public class NettyClientConnection implements Connection {
         messageListener = listener;
     }
 
-    public void onMessage(ByteBuf buf){
+    public void onMessage(ByteBuf buf) {
         Message message = messageService.resolve(buf.readBytes(buf.readableBytes()).array());
-        messageService.process(this,message);
+        messageService.process(this, message);
+        // 通知监听者
+        if (messageListener != null){
+            messageListener.onMessage(this,message);
+        }
     }
 }

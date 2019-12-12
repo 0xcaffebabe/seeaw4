@@ -13,29 +13,38 @@ import java.nio.ByteBuffer;
 /**
  * @author my
  */
-@ChannelHandler.Sharable
 @Slf4j
+@ChannelHandler.Sharable
 public class NettyClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
-    private static NettyClientHandler INSTANCE = new NettyClientHandler();
     private NettyClientConnection connection;
+
+    /**
+     * 是否为主动关闭
+     */
+    private boolean isInitClose = false;
+
+    public NettyClientHandler(NettyClientConnection connection) {
+        this.connection = connection;
+    }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         log.info("连接服务器成功");
-
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        log.info("客户端与服务器连接断开,正重新连接");
-        if (connection != null){
-            connection.connect();
-        }
-    }
+        if (!isInitClose){
+            log.info("客户端与服务器连接断开,正重新连接");
 
-    public static NettyClientHandler getInstance(){
-        return INSTANCE;
+            if (connection != null){
+                connection.connect();
+            }
+        }else {
+            log.info("连接主动关闭");
+        }
+
     }
 
     public void setNettyConnection(NettyClientConnection connection){
@@ -47,5 +56,9 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
         if (connection != null){
             connection.onMessage(msg);
         }
+    }
+
+    public void setInitClose(boolean initClose) {
+        isInitClose = initClose;
     }
 }

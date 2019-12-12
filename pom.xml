@@ -12,6 +12,7 @@
         <module>seeaw4_common</module>
         <module>seeaw4_client</module>
         <module>seeaw4_server</module>
+        <module>seeaw4_terminal</module>
     </modules>
 
     <dependencies>

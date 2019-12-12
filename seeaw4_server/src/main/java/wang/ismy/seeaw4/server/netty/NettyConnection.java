@@ -40,9 +40,7 @@ public class NettyConnection implements Connection{
     @Override
     public void sendMessage(Message message) throws IOException {
         byte[] build = messageService.build(message);
-        System.out.println(Arrays.toString(build));
         channel.writeAndFlush(Unpooled.wrappedBuffer(build));
-
     }
 
     @Override

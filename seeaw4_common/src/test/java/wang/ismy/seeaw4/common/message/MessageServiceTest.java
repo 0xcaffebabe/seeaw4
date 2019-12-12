@@ -2,8 +2,11 @@ package wang.ismy.seeaw4.common.message;
 
 import org.junit.Test;
 import org.mockito.Mockito;
+import wang.ismy.seeaw4.common.connection.Connection;
+import wang.ismy.seeaw4.common.message.chain.MessageChain;
 import wang.ismy.seeaw4.common.message.impl.TextMessage;
 
+import java.io.IOException;
 import java.util.Map;
 
 import static org.junit.Assert.*;
@@ -33,5 +36,16 @@ public class MessageServiceTest {
         byte[] build = messageService.build(msg);
         Message resolve = messageService.resolve(build);
         assertTrue(resolve.equals(msg));
+    }
+
+    @Test
+    public void processChain() throws IOException {
+        MessageService messageService = MessageService.getInstance();
+        MessageChain mockChain = Mockito.mock(MessageChain.class);
+        Connection mockConnection = Mockito.mock(Connection.class);
+        Message mockMessage = Mockito.mock(Message.class);
+        messageService.registerMessageChain(mockChain);
+        messageService.process(mockConnection,mockMessage);
+        Mockito.verify(mockChain).process(mockConnection,mockMessage);
     }
 }
