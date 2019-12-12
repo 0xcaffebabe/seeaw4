@@ -59,6 +59,7 @@ public class NettyClientConnection implements Connection {
                     }
                 });
         final ChannelFuture future = bootstrap.connect(ip, port);
+        this.channel = future.channel();
         // 如果连接不上自动重连
         future.addListener((ChannelFuture f) -> {
             if (!f.isSuccess()) {
@@ -89,8 +90,9 @@ public class NettyClientConnection implements Connection {
 
     @Override
     public void sendMessage(Message message) throws IOException {
+        byte[] build = messageService.build(message);
         channel.writeAndFlush(
-                Unpooled.wrappedBuffer(message.getPayload()));
+                Unpooled.wrappedBuffer(build));
     }
 
     @Override

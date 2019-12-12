@@ -11,6 +11,7 @@ import wang.ismy.seeaw4.common.message.MessageService;
 import wang.ismy.seeaw4.common.message.chain.impl.PrintMessageChain;
 
 import java.lang.annotation.ElementType;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -74,7 +75,9 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
     @Override
     protected void messageReceived(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
         Channel channel = ctx.channel();
-        Message message = messageService.resolve(msg.array());
+        byte[] array = msg.readBytes(msg.readableBytes()).array();
+
+        Message message = messageService.resolve(array);
         // 通知监听者
         if (messageListener != null){
             messageListener.onMessage(connectionService.get(channel),message);
