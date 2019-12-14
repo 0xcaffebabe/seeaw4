@@ -20,7 +20,7 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) throws IOException {
         Camera camera = new Camera();
-        FileOutputStream fos = new FileOutputStream("d:/photo.png");
+        FileOutputStream fos = new FileOutputStream("/home/my/photo.png");
         fos.write(camera.getCameraSnapshot());
         fos.close();
     }
