@@ -32,10 +32,10 @@ public class MessageServiceTest {
     @Test
     public void resolve(){
         MessageService messageService = MessageService.getInstance();
-        Message msg = new TextMessage("text", Map.of("name","july"));
+        Message msg = new TextMessage("text".getBytes(), Map.of("name","july"));
         byte[] build = messageService.build(msg);
         Message resolve = messageService.resolve(build);
-        assertTrue(resolve.equals(msg));
+        assertEquals(resolve, msg);
     }
 
     @Test

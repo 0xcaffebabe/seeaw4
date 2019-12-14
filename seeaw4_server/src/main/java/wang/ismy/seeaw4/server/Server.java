@@ -23,7 +23,7 @@ public class Server {
 		server.connector.bindConnectionListener(new ConnectionListener() {
 			@Override
 			public void establish(Connection connection) {
-				Message msg = new TextMessage("你好，客户端", Map.of("name","utf-8"));
+				Message msg = new TextMessage("你好，客户端".getBytes(), Map.of("name","utf-8"));
 				try {
 					connection.sendMessage(msg);
 				} catch (IOException e) {

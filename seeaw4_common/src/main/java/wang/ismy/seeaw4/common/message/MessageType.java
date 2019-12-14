@@ -19,7 +19,9 @@ public enum MessageType {
     /**
      * 图片消息
      */
-    IMG(1,MessageConverterFactory.imgMessageConverter());
+    IMG(1,MessageConverterFactory.imgMessageConverter()),
+
+    COMMAND(2,MessageConverterFactory.commandMessageConverter());
 
     private int code;
     private MessageConverter messageConverter;

@@ -16,7 +16,7 @@ public class TextMessageTest {
 
     @Before
     public void before(){
-        textMessage = new TextMessage(str,additions);
+        textMessage = new TextMessage(str.getBytes(),additions);
     }
 
     @Test

@@ -17,6 +17,7 @@ import wang.ismy.seeaw4.common.message.Message;
 import wang.ismy.seeaw4.common.message.MessageListener;
 import wang.ismy.seeaw4.common.message.MessageService;
 import wang.ismy.seeaw4.common.message.chain.impl.PrintMessageChain;
+import wang.ismy.seeaw4.server.message.chain.ServerMessageChain;
 import wang.ismy.seeaw4.server.netty.ChannelListener;
 import wang.ismy.seeaw4.server.netty.NettyConnection;
 import wang.ismy.seeaw4.server.netty.NettyConnectionService;
@@ -46,6 +47,7 @@ public class NettyConnector implements Connector, ChannelListener, MessageListen
         nettyServerHandler.setMessageListener(this);
         // 注册消息处理链
         messageService.registerMessageChain(new PrintMessageChain());
+        messageService.registerMessageChain(new ServerMessageChain());
         // 启动netty服务器
         executeService.excute(()->{
             NioEventLoopGroup mainGroup = new NioEventLoopGroup();

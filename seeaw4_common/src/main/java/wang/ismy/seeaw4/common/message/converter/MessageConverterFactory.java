@@ -1,5 +1,6 @@
 package wang.ismy.seeaw4.common.message.converter;
 
+import wang.ismy.seeaw4.common.message.converter.impl.CommandMessageConverter;
 import wang.ismy.seeaw4.common.message.converter.impl.ImgMessageConverter;
 import wang.ismy.seeaw4.common.message.converter.impl.TextMessageConverter;
 
@@ -15,5 +16,9 @@ public class MessageConverterFactory {
 
     public static MessageConverter textMessageConverter(){
         return new TextMessageConverter();
+    }
+
+    public static MessageConverter commandMessageConverter(){
+        return new CommandMessageConverter();
     }
 }

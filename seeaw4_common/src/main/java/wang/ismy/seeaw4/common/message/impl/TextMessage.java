@@ -13,29 +13,28 @@ import java.util.Objects;
  *
  * @author my
  */
-public class TextMessage implements Message {
+public class TextMessage extends Message {
 
-    private byte[] payload;
-    private Map<String, Object> additions;
-
-    public TextMessage(String msg, Map<String, Object> additions) {
-        payload = msg.getBytes();
-        this.additions = additions;
+    public TextMessage(byte[] payload, Map<String, Object> addition) {
+        super(payload, addition);
     }
 
-    @Override
-    public byte[] getPayload() {
-        return payload;
+    public TextMessage(String text){
+        super();
+        payload = text.getBytes();
+    }
+
+    public void setText(String msg) {
+        payload = msg.getBytes();
+    }
+
+    public String getText(){
+        return new String(payload);
     }
 
     @Override
     public MessageType messageType() {
         return MessageType.TEXT;
-    }
-
-    @Override
-    public Map<String, Object> addition() {
-        return additions;
     }
 
     @Override
@@ -48,12 +47,12 @@ public class TextMessage implements Message {
         }
         TextMessage that = (TextMessage) o;
         return Arrays.equals(payload, that.payload) &&
-                additions.equals(that.additions);
+                addition.equals(that.addition);
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(additions);
+        int result = Objects.hash(addition);
         result = 31 * result + Arrays.hashCode(payload);
         return result;
     }
@@ -62,7 +61,7 @@ public class TextMessage implements Message {
     public String toString() {
         return "TextMessage{" +
                 "payload=" + new String(payload) +
-                ", additions=" + additions +
+                ", additions=" + addition +
                 '}';
     }
 }

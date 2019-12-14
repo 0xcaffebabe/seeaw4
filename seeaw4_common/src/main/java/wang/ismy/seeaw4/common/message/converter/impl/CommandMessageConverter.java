@@ -3,21 +3,22 @@ package wang.ismy.seeaw4.common.message.converter.impl;
 import wang.ismy.seeaw4.common.message.Message;
 import wang.ismy.seeaw4.common.message.MessageType;
 import wang.ismy.seeaw4.common.message.converter.MessageConverter;
-import wang.ismy.seeaw4.common.message.impl.TextMessage;
+import wang.ismy.seeaw4.common.message.impl.CommandMessage;
 
 import java.util.Map;
 
 /**
- * @author my
+ * @author MY
+ * @date 2019/12/14 17:47
  */
-public class TextMessageConverter implements MessageConverter {
+public class CommandMessageConverter implements MessageConverter {
     @Override
     public Message convert(byte[] payload, Map<String, Object> additions) {
-        return new TextMessage(payload, additions);
+        return new CommandMessage(payload,additions);
     }
 
     @Override
     public MessageType messageType() {
-        return MessageType.TEXT;
+        return MessageType.COMMAND;
     }
 }
