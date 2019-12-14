@@ -1,33 +1,20 @@
 package wang.ismy.seeaw4.terminal.camera;
 
-import com.github.sarxos.webcam.Webcam;
-
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import wang.ismy.seeaw4.terminal.Resolution;
+import wang.ismy.seeaw4.terminal.enums.ImgType;
 
 /**
+ * 相机接口，所有相机都应有这些行为
  * @author MY
- * @date 2019/12/13 17:26
+ * @date 2019/12/14 15:20
  */
-public class Camera {
+public interface Camera {
 
-    public byte[] getCameraSnapshot(){
-        Webcam webcam = Webcam.getDefault();
-        webcam.setViewSize(new Dimension(640,480));
-        webcam.open();
-
-        ByteArrayOutputStream bos=new ByteArrayOutputStream();
-        try {
-            ImageIO.write(webcam.getImage(), "PNG", bos);
-            return bos.toByteArray();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }finally {
-            webcam.close();
-        }
-        return null;
-
-    }
+    /**
+     * 调用系统摄像机拍摄一张照片
+     * @param type 图片格式
+     * @param resolution 分辨率
+     * @return 图片数据
+     */
+    byte[] getCameraSnapshot(ImgType type, Resolution resolution);
 }

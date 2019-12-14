@@ -16,9 +16,9 @@ public class TerminalBufferTest {
         buffer.append("1111")
                 .append("2222")
                 .append("3333");
-        char[] chars = buffer.getBuffer();
+        String ret = buffer.getBuffer();
 
-        assertArrayEquals("111122223333".toCharArray(),chars);
+        assertEquals("111122223333",ret);
     }
 
     @Test
@@ -27,9 +27,8 @@ public class TerminalBufferTest {
         buffer.append("1111")
                 .append("2222")
                 .append("3333");
-        char[] chars = buffer.getBuffer();
-
-        assertArrayEquals("1122223333".toCharArray(),chars);
+        String ret = buffer.getBuffer();
+        assertEquals("1122223333",ret);
     }
 
 }
