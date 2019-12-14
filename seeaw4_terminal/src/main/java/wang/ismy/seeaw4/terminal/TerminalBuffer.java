@@ -1,6 +1,8 @@
 package wang.ismy.seeaw4.terminal;
 
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Queue;
 
 /**
  * 终端缓冲区，用来缓冲终端程序的输出字符
@@ -10,46 +12,44 @@ import java.util.Arrays;
  */
 public class TerminalBuffer {
 
-    private final char[] buffer;
+    private final StringBuffer buffer = new StringBuffer();
     private final int size;
-    private int writePos = 1;
 
     public TerminalBuffer(int size) {
-        buffer = new char[size + 1];
         this.size = size;
     }
 
-    public char[] getBuffer() {
-        return Arrays.copyOfRange(buffer, 1, writePos);
-
+    public synchronized String getBuffer() {
+        return buffer.toString();
     }
 
     public TerminalBuffer append(CharSequence sequence) {
         int length = sequence.length();
-        int i = size - writePos;
-        if (i < 0) {
-            bufferPreMove(length);
-        } else if (i < length) {
-            bufferPreMove(length - i);
-        }
-
-        for (int j = 0; j < length; j++) {
-            buffer[writePos++] = sequence.charAt(j);
+        synchronized (buffer) {
+            if (buffer.length() > size) {
+                trim();
+            }
+            buffer.append(sequence);
+            // 添加后检查是否还要修剪
+            if (buffer.length() > size) {
+                trim();
+            }
         }
         return this;
-
     }
 
-
-    /**
-     * 将buffer向前移动n个位置，空出n个位置
-     */
-    private void bufferPreMove(int size) {
-        for (int i = size; i <= this.size; i++) {
-            buffer[i - size] = buffer[i-1];
+    private void trim() {
+        // 修剪的数量等于缓冲区现在的尺寸与规定的尺寸之差
+        int count = buffer.length() - size;
+        if (count <= 0) {
+            return;
         }
-        // 将write指针回退到size-1个位置前
-        writePos -= size - 1;
+        buffer.delete(0,count);
+    }
+
+    public TerminalBuffer append(char c) {
+        append(String.valueOf(c));
+        return this;
     }
 
 
