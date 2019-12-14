@@ -5,6 +5,7 @@ import wang.ismy.seeaw4.terminal.Terminal;
 import wang.ismy.seeaw4.terminal.camera.Camera;
 import wang.ismy.seeaw4.terminal.camera.WebCamera;
 import wang.ismy.seeaw4.terminal.desktop.Desktop;
+import wang.ismy.seeaw4.terminal.desktop.impl.LinuxDesktop;
 import wang.ismy.seeaw4.terminal.desktop.impl.WindowsDesktop;
 import wang.ismy.seeaw4.terminal.enums.ShellType;
 
@@ -38,6 +39,9 @@ public class CommonTerminal extends Terminal {
         switch (OsUtils.getOS()) {
             case WIN:
                 desktop = new WindowsDesktop();
+                break;
+            case NIX:
+                desktop = new LinuxDesktop();
                 break;
             default:
                 desktop = null;
