@@ -9,9 +9,7 @@ import wang.ismy.seeaw4.common.message.chain.MessageChain;
 import wang.ismy.seeaw4.common.utils.BytesUtils;
 
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 消息服务,用来处理消息
@@ -30,8 +28,8 @@ public class MessageService {
 
     private MessageService(){}
 
-    public void registerMessageChain(MessageChain messageChain){
-        messageChainList.add(messageChain);
+    public void registerMessageChain(MessageChain... messageChain){
+        messageChainList.addAll(Arrays.asList(messageChain));
     }
 
     /**
