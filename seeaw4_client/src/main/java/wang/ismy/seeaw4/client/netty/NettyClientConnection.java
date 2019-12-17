@@ -9,12 +9,15 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import lombok.extern.slf4j.Slf4j;
+import wang.ismy.seeaw4.common.connection.ConnectionListener;
 import wang.ismy.seeaw4.common.message.Message;
 import wang.ismy.seeaw4.common.connection.Connection;
 import wang.ismy.seeaw4.common.connection.ConnectionInfo;
 import wang.ismy.seeaw4.common.message.MessageListener;
 import wang.ismy.seeaw4.common.message.MessageService;
+import wang.ismy.seeaw4.common.message.SelfMessageEncoder;
 import wang.ismy.seeaw4.common.message.chain.impl.PrintMessageChain;
 import wang.ismy.seeaw4.common.message.impl.TextMessage;
 
@@ -39,6 +42,7 @@ public class NettyClientConnection implements Connection {
     private NettyClientHandler nettyClientHandler;
     private final MessageService messageService = MessageService.getInstance();
     private NioEventLoopGroup group;
+    private ConnectionListener connectionListener;
 
     public NettyClientConnection(String ip, int port) {
         nettyClientHandler = new NettyClientHandler(this);
@@ -54,7 +58,12 @@ public class NettyClientConnection implements Connection {
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
-                        ch.pipeline().addLast(nettyClientHandler);
+                        ByteBuf delimiter = Unpooled.copiedBuffer("$_0xca".getBytes());
+
+                        ch.pipeline()
+                                .addLast("encoder",new SelfMessageEncoder())
+                                .addLast("decoder",new DelimiterBasedFrameDecoder(1024*1024,delimiter))
+                                .addLast(nettyClientHandler);
                     }
                 });
         final ChannelFuture future = bootstrap.connect(ip, port);
@@ -103,5 +112,24 @@ public class NettyClientConnection implements Connection {
         if (messageListener != null){
             messageListener.onMessage(this,message);
         }
+    }
+
+    @Override
+    public void active() {
+        if (connectionListener != null){
+            connectionListener.establish(this);
+        }
+    }
+
+    @Override
+    public void inActive() {
+        if (connectionListener != null){
+            connectionListener.close(this);
+        }
+    }
+
+    @Override
+    public void bindConnectionListener(ConnectionListener listener) {
+        this.connectionListener = listener;
     }
 }

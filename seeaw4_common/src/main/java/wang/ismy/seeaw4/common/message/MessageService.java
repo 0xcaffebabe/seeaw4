@@ -26,14 +26,16 @@ public class MessageService {
     private Gson gson = new Gson();
     private List<MessageChain> messageChainList = new LinkedList<>();
 
-    private MessageService(){}
+    private MessageService() {
+    }
 
-    public void registerMessageChain(MessageChain... messageChain){
+    public void registerMessageChain(MessageChain... messageChain) {
         messageChainList.addAll(Arrays.asList(messageChain));
     }
 
     /**
      * 将一条消息转化为字节数组
+     *
      * @param message 消息
      * @return 字节数组
      */
@@ -63,19 +65,22 @@ public class MessageService {
         // 拷贝载荷
         System.arraycopy(payload, 0, ret, type.length + offset.length + addition.length, payload.length);
         return ret;
+
     }
 
     /**
      * 将一个字节数组转化为消息
+     *
      * @param bytes 字节数
      * @return 消息
      */
     public Message resolve(byte[] bytes) {
+
         byte[] type = BytesUtils.subBytes(bytes, 0, 4);
         byte[] offset = BytesUtils.subBytes(bytes, 4, 4);
         int offsetInt = byteArrayToInt(offset);
         byte[] additions = BytesUtils.subBytes(bytes, 8, offsetInt);
-        byte[] payload = BytesUtils.subBytes(bytes, offsetInt+8, bytes.length - offsetInt-8);
+        byte[] payload = BytesUtils.subBytes(bytes, offsetInt + 8, bytes.length - offsetInt - 8);
         MessageType messageType = MessageType.valueOf(byteArrayToInt(type));
         Map map = gson.fromJson(new String(additions), Map.class);
         return messageType.getMessageConverter().convert(payload, map);
@@ -83,21 +88,22 @@ public class MessageService {
 
     /**
      * 交由系统的消息处理链处理消息
+     *
      * @param connection
      * @param message
      */
-    public void process(Connection connection,Message message){
+    public void process(Connection connection, Message message) {
         for (MessageChain messageChain : messageChainList) {
             try {
-                messageChain.process(connection,message);
+                messageChain.process(connection, message);
             } catch (IOException e) {
-                log.info("消息链发生异常,{}",e.getMessage());
+                log.info("消息链发生异常,{}", e.getMessage());
                 e.printStackTrace();
             }
         }
     }
 
-    public static MessageService getInstance(){
+    public static MessageService getInstance() {
         return INSTANCE;
     }
 

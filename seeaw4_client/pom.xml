@@ -25,6 +25,12 @@
             <groupId>wang.ismy</groupId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>wang.ismy</groupId>
+            <artifactId>seeaw4_terminal</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
 </project>

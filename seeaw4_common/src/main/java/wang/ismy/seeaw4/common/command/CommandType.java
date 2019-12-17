@@ -10,7 +10,11 @@ public enum CommandType {
     /**
      * 接收到这个消息，需要把本地所有客户端回传
      */
-    LIST_CLIENT()
-    ;
+    LIST_CLIENT(),
 
+    /**
+     * 接到该消息，就代表需要回传屏幕截图
+     */
+    SCREEN()
+    ;
 }

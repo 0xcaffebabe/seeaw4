@@ -32,8 +32,28 @@ public interface Connection extends AutoCloseable{
 	void sendMessage(Message message) throws IOException;
 
 	/**
-	 * 向该连接绑定一个消息到达监听
+	 * 向该连接绑定一个消息到达监听器
 	 * @param listener 消息监听对象
 	 */
-	void bindMessageListener(MessageListener listener);
+	default void bindMessageListener(MessageListener listener){
+
+	}
+
+	/**
+	 * 连接建立时会调用该方法
+	 */
+	default void active(){ }
+
+	/**
+	 * 连接断开时会调用该方法
+	 */
+	default void inActive(){ }
+
+	/**
+	 * 绑定连接监听器
+	 * @param listener
+	 */
+	default void bindConnectionListener(ConnectionListener listener){
+
+	}
 }

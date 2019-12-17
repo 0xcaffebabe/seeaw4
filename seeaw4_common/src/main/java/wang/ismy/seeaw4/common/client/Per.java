@@ -1,6 +1,7 @@
 package wang.ismy.seeaw4.common.client;
 
 import lombok.Data;
+import lombok.ToString;
 
 /**
  * 代表客户
@@ -8,7 +9,8 @@ import lombok.Data;
  * @date 2019/12/17 9:49
  */
 @Data
-public class Client {
+@ToString
+public class Per {
 
     private String ip;
     private int port;

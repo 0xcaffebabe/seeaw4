@@ -3,6 +3,7 @@ package wang.ismy.seeaw4.common.message.converter.impl;
 import wang.ismy.seeaw4.common.message.Message;
 import wang.ismy.seeaw4.common.message.MessageType;
 import wang.ismy.seeaw4.common.message.converter.MessageConverter;
+import wang.ismy.seeaw4.common.message.impl.ImgMessage;
 
 import java.util.Map;
 
@@ -13,7 +14,7 @@ import java.util.Map;
 public class ImgMessageConverter implements MessageConverter {
     @Override
     public Message convert(byte[] payload, Map<String, Object> additions) {
-        return null;
+        return new ImgMessage(payload,additions);
     }
 
     @Override

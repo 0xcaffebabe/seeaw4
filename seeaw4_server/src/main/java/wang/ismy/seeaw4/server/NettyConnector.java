@@ -1,11 +1,16 @@
 package wang.ismy.seeaw4.server;
 
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.DelimiterBasedFrameDecoder;
+import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.timeout.IdleStateHandler;
 import jdk.dynalink.linker.TypeBasedGuardingDynamicLinker;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +21,9 @@ import wang.ismy.seeaw4.common.connection.ConnectionListener;
 import wang.ismy.seeaw4.common.message.Message;
 import wang.ismy.seeaw4.common.message.MessageListener;
 import wang.ismy.seeaw4.common.message.MessageService;
+import wang.ismy.seeaw4.common.message.SelfMessageEncoder;
 import wang.ismy.seeaw4.common.message.chain.impl.PrintMessageChain;
+import wang.ismy.seeaw4.common.message.chain.impl.PromiseMessageChain;
 import wang.ismy.seeaw4.server.message.chain.ServerMessageChain;
 import wang.ismy.seeaw4.server.netty.ChannelListener;
 import wang.ismy.seeaw4.server.netty.NettyConnection;
@@ -46,7 +53,7 @@ public class NettyConnector implements Connector, ChannelListener, MessageListen
         // 监听消息
         nettyServerHandler.setMessageListener(this);
         // 注册消息处理链
-        messageService.registerMessageChain(new PrintMessageChain());
+        messageService.registerMessageChain(new PrintMessageChain(),PromiseMessageChain.getInstance());
         messageService.registerMessageChain(new ServerMessageChain());
         // 启动netty服务器
         executeService.excute(()->{
@@ -65,7 +72,10 @@ public class NettyConnector implements Connector, ChannelListener, MessageListen
                         .childHandler(new ChannelInitializer<>() {
                             @Override
                             protected void initChannel(Channel channel) throws Exception {
+                                ByteBuf delimiter = Unpooled.copiedBuffer("$_0xca".getBytes());
                                 channel.pipeline()
+                                        .addLast("encoder",new SelfMessageEncoder())
+                                        .addLast("decoder",new DelimiterBasedFrameDecoder(1024*1024,delimiter))
                                         .addLast(new IdleStateHandler(5,10,15, TimeUnit.SECONDS))
                                         .addLast(nettyServerHandler);
                             }

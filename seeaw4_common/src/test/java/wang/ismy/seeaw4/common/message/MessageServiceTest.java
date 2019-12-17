@@ -5,6 +5,7 @@ import org.mockito.Mockito;
 import wang.ismy.seeaw4.common.connection.Connection;
 import wang.ismy.seeaw4.common.message.chain.MessageChain;
 import wang.ismy.seeaw4.common.message.impl.TextMessage;
+import wang.ismy.seeaw4.common.utils.BytesUtils;
 
 import java.io.IOException;
 import java.util.Map;
@@ -24,8 +25,9 @@ public class MessageServiceTest {
         Mockito.when(mockMsg.messageType())
                 .thenReturn(MessageType.TEXT);
         // 前4个字节代表消息类型　5-8个字节代表附加消息偏移量　9-偏移量+1代表附加消息　最后一部分是有效载荷
-        byte[] expectedBytes = new byte[]{0,0,0,0,0,0,0,0,1,1};
+        byte[] expectedBytes = BytesUtils.concat(new byte[]{0,0,0,0,0,0,0,0,1,1},"$_0xca".getBytes());
         byte[] build = messageService.build(mockMsg);
+
         assertArrayEquals(expectedBytes,build);
     }
 

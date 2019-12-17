@@ -1,6 +1,6 @@
 package wang.ismy.seeaw4.server.command;
 
-import wang.ismy.seeaw4.common.client.Client;
+import wang.ismy.seeaw4.common.client.Per;
 import wang.ismy.seeaw4.common.command.CommandHandler;
 import wang.ismy.seeaw4.common.connection.Connection;
 import wang.ismy.seeaw4.common.message.Message;
@@ -33,13 +33,13 @@ public class ServerCommandHandler implements CommandHandler {
 
     private Message getClientList(Connection connection, CommandMessage message) {
         List<Connection> connectionList = connectionService.getConnectionList();
-        List<Client> ret = new ArrayList<>();
+        List<Per> ret = new ArrayList<>();
         for (Connection conn : connectionList) {
-            Client client = new Client();
-            client.setIp(conn.getInfo().getSocketAddress().getAddress().getHostAddress());
-            client.setPort(conn.getInfo().getSocketAddress().getPort());
-            client.setConnectTime(conn.getInfo().getConnectedTime());
-            ret.add(client);
+            Per per = new Per();
+            per.setIp(conn.getInfo().getSocketAddress().getAddress().getHostAddress());
+            per.setPort(conn.getInfo().getSocketAddress().getPort());
+            per.setConnectTime(conn.getInfo().getConnectedTime());
+            ret.add(per);
         }
 
         return new TextMessage(JsonUtils.toJson(ret));

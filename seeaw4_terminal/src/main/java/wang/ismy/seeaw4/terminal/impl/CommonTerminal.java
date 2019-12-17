@@ -84,12 +84,16 @@ public class CommonTerminal extends Terminal {
 
     @Override
     public Camera getCamera() {
-        return null;
+        return new WebCamera();
     }
 
     @Override
     public Desktop getDesktop() {
-        return null;
+        if (OsUtils.getOS().equals(OsUtils.WIN)){
+            return new WindowsDesktop();
+        }else {
+            return null;
+        }
     }
 
 
