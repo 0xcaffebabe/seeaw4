@@ -1,6 +1,7 @@
 package wang.ismy.seeaw4.client;
 
 import wang.ismy.seeaw4.client.netty.NettyClientConnection;
+import wang.ismy.seeaw4.common.command.CommandType;
 import wang.ismy.seeaw4.common.message.Message;
 import wang.ismy.seeaw4.common.message.MessageService;
 import wang.ismy.seeaw4.common.message.chain.impl.PrintMessageChain;
@@ -24,7 +25,7 @@ public class Client {
         Scanner scanner = new Scanner(System.in);
         Thread.sleep(2000);
         CommandMessage message = new CommandMessage();
-        message.setCommand("list-client");
+        message.setCommand(CommandType.LIST_CLIENT);
         ConnectionPromise promise = new ConnectionPromise(message)
                 .success((conn,msg)->{
                     System.out.println(conn+"回复了"+msg);

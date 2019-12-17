@@ -1,5 +1,6 @@
 package wang.ismy.seeaw4.common.message.impl;
 
+import wang.ismy.seeaw4.common.command.CommandType;
 import wang.ismy.seeaw4.common.connection.Connection;
 import wang.ismy.seeaw4.common.message.Message;
 import wang.ismy.seeaw4.common.message.MessageType;
@@ -30,11 +31,15 @@ public class CommandMessage extends Message {
         return MessageType.COMMAND;
     }
 
-    public String getCommand(){
-        return addition.get("cmd").toString();
+    public CommandType getCommand(){
+        Object cmd = addition.get("cmd");
+        if (cmd == null){
+            throw new IllegalStateException("cmd 类型为空");
+        }
+        return CommandType.valueOf(cmd.toString());
     }
 
-    public void setCommand(String cmd){
-        addition.put("cmd",cmd);
+    public void setCommand(CommandType type){
+        addition.put("cmd",type.name());
     }
 }
