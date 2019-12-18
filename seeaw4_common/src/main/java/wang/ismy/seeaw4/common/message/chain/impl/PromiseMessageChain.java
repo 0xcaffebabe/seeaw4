@@ -43,7 +43,8 @@ public class PromiseMessageChain implements MessageChain {
             Object o = addition.get(PROMISE_CALLBACK);
             if (o != null) {
                 String key = o.toString();
-                ConnectionPromise promise = promiseMap.get(key);
+                // 当存在对应id的回调对象时，取出来，执行callback ，然后从map中删除
+                ConnectionPromise promise = promiseMap.remove(key);
                 if (promise != null){
                     promise.getCallback().success(connection,message);
                 }

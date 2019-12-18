@@ -7,6 +7,7 @@ import lombok.Getter;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.util.UUID;
 
 /**
  * 一个存放连接信息的POJO
@@ -14,6 +15,8 @@ import java.net.SocketAddress;
  */
 @Getter
 public class ConnectionInfo {
+
+    private String connectionId;
 
     /**
      * 连接地址信息
@@ -32,6 +35,7 @@ public class ConnectionInfo {
         }else{
             throw new IllegalArgumentException("socket address 无法解析!");
         }
+        this.connectionId = UUID.randomUUID().toString();
         this.connectedTime = connectedTime;
 
     }
