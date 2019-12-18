@@ -60,7 +60,7 @@ public class TextMessage extends Message {
     @Override
     public String toString() {
         return "TextMessage{" +
-                "payload=" + new String(payload) +
+                "text=" + new String(payload) +
                 ", additions=" + addition +
                 '}';
     }

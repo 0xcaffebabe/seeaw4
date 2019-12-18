@@ -22,6 +22,10 @@ import wang.ismy.seeaw4.terminal.Terminal;
 import wang.ismy.seeaw4.terminal.enums.ShellType;
 import wang.ismy.seeaw4.terminal.impl.CommonTerminal;
 
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -38,7 +42,7 @@ public class Client {
     private Terminal terminal;
     public Client() {
         try {
-            terminal = new CommonTerminal(ShellType.BASH);
+            terminal = new CommonTerminal();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -96,23 +100,15 @@ public class Client {
             String id = scanner.nextLine();
             if (id.contains("-")){
                 CommandMessage cmd = new CommandMessage();
-                cmd.setCommand(CommandType.SCREEN);
+                cmd.setCommand(CommandType.SHELL_BUFFER);
                 cmd.addition().put(CommandKey.PER_ID,id);
                 client.clientService.sendCallbackMessage(cmd,(conn,msg)->{
 
-                    log.info("{}接收到截屏回复:{}",conn,msg);
-                    if (msg instanceof ImgMessage){
-                        ImgMessage imgMsg = (ImgMessage) msg;
-                        try {
-                            FileOutputStream fos = new FileOutputStream("/home/my/client."+ imgMsg.getFormat());
-                            fos.write(imgMsg.getPayload());
-                            fos.close();
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                    log.info("{}接收到shell buffer回复:{}",conn,msg);
+                    if (msg instanceof TextMessage){
+                        System.out.println(((TextMessage) msg).getText());
                     }
+
                 });
             }
         }

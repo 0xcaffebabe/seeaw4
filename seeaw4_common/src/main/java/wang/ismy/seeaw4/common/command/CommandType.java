@@ -21,6 +21,12 @@ public enum CommandType {
     /**
      * 接受到该消息，就需要回传摄像头图片
      */
-    PHOTO()
+    PHOTO(),
+
+
+    /**
+     * 接受到该消息，就代表需要把terminal中的SHELL buffer回传
+     */
+    SHELL_BUFFER()
     ;
 }

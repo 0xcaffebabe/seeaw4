@@ -5,6 +5,7 @@ import wang.ismy.seeaw4.common.connection.Connection;
 import wang.ismy.seeaw4.common.message.Message;
 import wang.ismy.seeaw4.common.message.impl.CommandMessage;
 import wang.ismy.seeaw4.common.message.impl.ImgMessage;
+import wang.ismy.seeaw4.common.message.impl.TextMessage;
 import wang.ismy.seeaw4.terminal.Resolution;
 import wang.ismy.seeaw4.terminal.Terminal;
 import wang.ismy.seeaw4.terminal.enums.ImgType;
@@ -28,6 +29,8 @@ public class ClientCommandHandler implements CommandHandler {
                 return screen(connection,commandMessage);
             case PHOTO:
                 return photo(connection,commandMessage);
+            case SHELL_BUFFER:
+                return shellBuffer(connection, commandMessage);
             default:
                 return null;
         }
@@ -41,5 +44,10 @@ public class ClientCommandHandler implements CommandHandler {
     private Message photo(Connection connection,CommandMessage message){
         byte[] screen = terminal.getCamera().getCameraSnapshot(ImgType.JPEG, new Resolution(640,480));
         return new ImgMessage(screen,ImgType.JPEG.getFormat());
+    }
+
+    private Message shellBuffer(Connection connection,CommandMessage message){
+
+        return new TextMessage(terminal.getTerminalBuffer());
     }
 }
