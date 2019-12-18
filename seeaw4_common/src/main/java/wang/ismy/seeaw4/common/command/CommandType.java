@@ -15,6 +15,12 @@ public enum CommandType {
     /**
      * 接到该消息，就代表需要回传屏幕截图
      */
-    SCREEN()
+    SCREEN(),
+
+
+    /**
+     * 接受到该消息，就需要回传摄像头图片
+     */
+    PHOTO()
     ;
 }

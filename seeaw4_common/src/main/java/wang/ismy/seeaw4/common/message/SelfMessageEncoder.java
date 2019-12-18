@@ -14,10 +14,12 @@ import wang.ismy.seeaw4.common.utils.BytesUtils;
 public class SelfMessageEncoder extends MessageToByteEncoder<ByteBuf> {
 
     private static final byte[] delimiter = "$_0xca".getBytes();
-
+    private MessageService messageService = MessageService.getInstance();
     @Override
     protected void encode(ChannelHandlerContext ctx, ByteBuf msg, ByteBuf out) throws Exception {
-        log.info("encode 数据,{},{}",msg,out);
-        out.writeBytes(BytesUtils.concat(msg.readBytes(msg.readableBytes()).array(),delimiter));
+        byte[] bytes = msg.readBytes(msg.readableBytes()).array();
+        Message resolve = messageService.resolve(bytes);
+        log.info("encode 数据,{}",resolve);
+        out.writeBytes(BytesUtils.concat(bytes,delimiter));
     }
 }

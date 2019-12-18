@@ -89,11 +89,9 @@ public class CommonTerminal extends Terminal {
 
     @Override
     public Desktop getDesktop() {
-        if (OsUtils.getOS().equals(OsUtils.WIN)){
-            return new WindowsDesktop();
-        }else {
-            return null;
-        }
+
+        return new WindowsDesktop();
+
     }
 
 

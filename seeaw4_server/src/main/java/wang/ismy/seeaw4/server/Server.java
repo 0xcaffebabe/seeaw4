@@ -23,35 +23,19 @@ import java.util.Map;
 public class Server {
 	
 	private Connector connector  = new NettyConnector();
+	private ServerService serverService;
+
+	public Connector getConnector(){
+		return connector;
+	}
 
 	public static void main(String[] args) {
 		Server server = new Server();
+		server.serverService = new ServerService(server);
 		server.connector.bindConnectionListener(new ConnectionListener() {
 			@Override
 			public void establish(Connection connection) {
-				// 向客户发起一个截屏请求
-				log.info("截屏请求");
-				CommandMessage cmd  = new CommandMessage();
-				cmd.setCommand(CommandType.SCREEN);
-				new ConnectionPromise(cmd)
-						.success((conn,msg)->{
-							log.info("接收到客户端截屏回复:{},{}",conn,msg);
-							if (msg instanceof ImgMessage){
-								try(FileOutputStream fos = new FileOutputStream("d:/screen."+((ImgMessage) msg).getFormat());) {
 
-									fos.write(msg.getPayload());
-								} catch (IOException e) {
-									e.printStackTrace();
-								}
-
-							}
-						})
-						.async();
-				try {
-					connection.sendMessage(cmd);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
 			}
 
 			@Override

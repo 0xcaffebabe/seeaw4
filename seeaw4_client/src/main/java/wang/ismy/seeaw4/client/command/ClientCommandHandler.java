@@ -25,6 +25,8 @@ public class ClientCommandHandler implements CommandHandler {
     public Message process(Connection connection, CommandMessage commandMessage) {
         switch (commandMessage.getCommand()){
             case SCREEN:
+                return screen(connection,commandMessage);
+            case PHOTO:
                 return photo(connection,commandMessage);
             default:
                 return null;

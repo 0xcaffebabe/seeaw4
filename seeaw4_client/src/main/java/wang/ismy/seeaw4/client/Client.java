@@ -1,9 +1,11 @@
 package wang.ismy.seeaw4.client;
 
 import com.google.gson.reflect.TypeToken;
+import lombok.extern.slf4j.Slf4j;
 import wang.ismy.seeaw4.client.message.chain.ClientCommandMessageChain;
 import wang.ismy.seeaw4.client.netty.NettyClientConnection;
 import wang.ismy.seeaw4.common.client.Per;
+import wang.ismy.seeaw4.common.command.CommandKey;
 import wang.ismy.seeaw4.common.command.CommandType;
 import wang.ismy.seeaw4.common.connection.Connection;
 import wang.ismy.seeaw4.common.connection.ConnectionListener;
@@ -12,6 +14,7 @@ import wang.ismy.seeaw4.common.message.MessageService;
 import wang.ismy.seeaw4.common.message.chain.impl.PrintMessageChain;
 import wang.ismy.seeaw4.common.message.chain.impl.PromiseMessageChain;
 import wang.ismy.seeaw4.common.message.impl.CommandMessage;
+import wang.ismy.seeaw4.common.message.impl.ImgMessage;
 import wang.ismy.seeaw4.common.message.impl.TextMessage;
 import wang.ismy.seeaw4.common.promise.ConnectionPromise;
 import wang.ismy.seeaw4.common.utils.JsonUtils;
@@ -19,11 +22,14 @@ import wang.ismy.seeaw4.terminal.Terminal;
 import wang.ismy.seeaw4.terminal.enums.ShellType;
 import wang.ismy.seeaw4.terminal.impl.CommonTerminal;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Member;
 import java.util.List;
 import java.util.Scanner;
 
+@Slf4j
 public class Client {
 
     private ClientService clientService;
@@ -32,7 +38,7 @@ public class Client {
     private Terminal terminal;
     public Client() {
         try {
-            terminal = new CommonTerminal(ShellType.POWER_SHELL);
+            terminal = new CommonTerminal(ShellType.BASH);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -64,6 +70,7 @@ public class Client {
                 // 连接成功后从服务器拉取在线客户
                 try {
                     client.clientService.selectClientList((connection1, message) -> {
+                        log.info("接收到查询在线列表回调");
                         if (message instanceof TextMessage) {
                             List<Per> list = JsonUtils.fromJson(((TextMessage) message).getText(), new TypeToken<List<Per>>() {
                             }.getType());
@@ -83,7 +90,32 @@ public class Client {
             }
         });
         client.init();
-        System.in.read();
+
+        Scanner scanner = new Scanner(System.in);
+        while (scanner.hasNextLine()){
+            String id = scanner.nextLine();
+            if (id.contains("-")){
+                CommandMessage cmd = new CommandMessage();
+                cmd.setCommand(CommandType.SCREEN);
+                cmd.addition().put(CommandKey.PER_ID,id);
+                client.clientService.sendCallbackMessage(cmd,(conn,msg)->{
+
+                    log.info("{}接收到截屏回复:{}",conn,msg);
+                    if (msg instanceof ImgMessage){
+                        ImgMessage imgMsg = (ImgMessage) msg;
+                        try {
+                            FileOutputStream fos = new FileOutputStream("/home/my/client."+ imgMsg.getFormat());
+                            fos.write(imgMsg.getPayload());
+                            fos.close();
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+        }
     }
 
 

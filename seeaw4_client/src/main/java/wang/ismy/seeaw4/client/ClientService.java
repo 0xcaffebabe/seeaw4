@@ -2,6 +2,7 @@ package wang.ismy.seeaw4.client;
 
 import wang.ismy.seeaw4.common.command.CommandType;
 import wang.ismy.seeaw4.common.connection.Connection;
+import wang.ismy.seeaw4.common.message.Message;
 import wang.ismy.seeaw4.common.message.impl.CommandMessage;
 import wang.ismy.seeaw4.common.promise.ConnectionPromise;
 
@@ -28,11 +29,20 @@ public class ClientService {
     public void selectClientList(ConnectionPromise.SuccessCallback callback) throws IOException {
         CommandMessage message = new CommandMessage();
         message.setCommand(CommandType.LIST_CLIENT);
-
         new ConnectionPromise(message)
                 .success(callback)
                 .async();
-
         connection.sendMessage(message);
+    }
+
+    public void sendCallbackMessage(Message message, ConnectionPromise.SuccessCallback callback){
+        new ConnectionPromise(message)
+                .success(callback)
+                .async();
+        try {
+            connection.sendMessage(message);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

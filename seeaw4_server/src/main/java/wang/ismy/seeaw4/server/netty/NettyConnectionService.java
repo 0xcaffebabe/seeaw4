@@ -59,7 +59,17 @@ public class NettyConnectionService {
         return new ArrayList<>(channelConnectionMap.keySet());
     }
 
+    public Connection getConnectionById(String id){
+        for (Connection connection : getConnectionList()) {
+            if (connection.getInfo().getConnectionId().equals(id)){
+                return connection;
+            }
+        }
+        return null;
+    }
     public static NettyConnectionService getInstance(){
         return INSTANCE;
     }
+
+
 }
