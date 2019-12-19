@@ -42,4 +42,8 @@ public class CommandMessage extends Message {
     public void setCommand(CommandType type){
         addition.put("cmd",type.name());
     }
+
+    public void setPayload(byte[] payload){
+        this.payload = payload;
+    }
 }

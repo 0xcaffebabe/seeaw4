@@ -17,6 +17,10 @@ public class Per {
     private String ip;
     private int port;
     private long connectTime;
+    /**
+     * 该客户是否是自己
+     */
+    private boolean self=false;
 
     public static Per convert(Connection conn){
         Per per = new Per();

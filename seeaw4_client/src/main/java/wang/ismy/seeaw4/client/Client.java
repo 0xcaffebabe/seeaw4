@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.lang.reflect.Member;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class Client {
@@ -40,6 +41,7 @@ public class Client {
     private Connection connection;
     private ConnectionListener connectionListener;
     private Terminal terminal;
+
     public Client() {
         try {
             terminal = new CommonTerminal();
@@ -98,19 +100,33 @@ public class Client {
         Scanner scanner = new Scanner(System.in);
         while (scanner.hasNextLine()){
             String id = scanner.nextLine();
+            CommandMessage cmd = new CommandMessage();
             if (id.contains("-")){
-                CommandMessage cmd = new CommandMessage();
-                cmd.setCommand(CommandType.SHELL_BUFFER);
+                // 发起一条shell_bind
+                cmd.setCommand(CommandType.SHELL_BIND);
                 cmd.addition().put(CommandKey.PER_ID,id);
+                cmd.addition().put(CommandKey.SELF_ID,scanner.nextLine());
                 client.clientService.sendCallbackMessage(cmd,(conn,msg)->{
-
-                    log.info("{}接收到shell buffer回复:{}",conn,msg);
+                    log.info("接收到shell bind 回调,{}",msg);
                     if (msg instanceof TextMessage){
-                        System.out.println(((TextMessage) msg).getText());
+                        if ("绑定成功".equals(((TextMessage) msg).getText())){
+                            // 发起一条shell_cmd
+                            cmd.setCommand(CommandType.SHELL_CMD);
+                            cmd.setPayload("uptime".getBytes());
+                            try {
+                                client.connection.sendMessage(cmd);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
                     }
 
                 });
+
+
             }
+
         }
     }
 

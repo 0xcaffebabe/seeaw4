@@ -66,4 +66,10 @@ public class NettyConnection implements Connection{
         return Objects.hash(channel, connectionInfo);
     }
 
+    @Override
+    public String toString() {
+        return "NettyConnection{" +
+                "connectionInfo=" + connectionInfo +
+                '}';
+    }
 }

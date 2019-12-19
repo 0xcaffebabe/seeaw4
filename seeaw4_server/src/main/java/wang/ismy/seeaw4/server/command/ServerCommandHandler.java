@@ -33,15 +33,8 @@ public class ServerCommandHandler implements CommandHandler {
             case LIST_CLIENT:
                 return getClientList(connection, commandMessage);
             // 服务端如果接收到screen请求，那服务端要去发起客户端指定的另一个客户端的screen请求
-            case SCREEN:
-                return sendMsgAndCallback(connection, commandMessage,CommandType.SCREEN);
-            // 服务端如果接收到photo请求，那服务端要去发起客户端指定的另一个客户端的photo请求
-            case PHOTO:
-                return sendMsgAndCallback(connection, commandMessage,CommandType.PHOTO);
-            case SHELL_BUFFER:
-                return sendMsgAndCallback(connection, commandMessage,CommandType.SHELL_BUFFER);
             default:
-                return null;
+                return sendMsgAndCallback(connection,commandMessage,commandMessage.getCommand());
         }
     }
 
@@ -63,6 +56,10 @@ public class ServerCommandHandler implements CommandHandler {
         String perId = o.toString();
         CommandMessage clientCmd = new CommandMessage();
         clientCmd.setCommand(commandType);
+        //　如果发来的消息带有self-id,那么需要把self-id转为 per-id带上
+        clientCmd.addition().put(CommandKey.PER_ID,commandMessage.addition().get(CommandKey.SELF_ID));
+        // 如果发来的消息带有载荷，则也附带上
+        clientCmd.setPayload(commandMessage.getPayload());
         new ConnectionPromise(clientCmd)
                 .success((conn, msg) -> {
                     // 获取主控方的回调id
@@ -95,8 +92,15 @@ public class ServerCommandHandler implements CommandHandler {
     private Message getClientList(Connection connection, CommandMessage message) {
         List<Per> ret = connectionService.getConnectionList()
                 .stream()
-                .map(Per::convert)
+                .map(conn->{
+                    Per per = Per.convert(conn);
+                    if (conn.equals(connection)){
+                        per.setSelf(true);
+                    }
+                    return per;
+                })
                 .collect(Collectors.toList());
+
         return new TextMessage(JsonUtils.toJson(ret));
     }
 }

@@ -132,4 +132,12 @@ public class NettyClientConnection implements Connection {
     public void bindConnectionListener(ConnectionListener listener) {
         this.connectionListener = listener;
     }
+
+    @Override
+    public String toString() {
+        return "NettyClientConnection{" +
+                "ip='" + ip + '\'' +
+                ", port=" + port +
+                '}';
+    }
 }

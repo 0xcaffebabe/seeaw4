@@ -39,4 +39,11 @@ public class ConnectionInfo {
         this.connectedTime = connectedTime;
 
     }
+
+    @Override
+    public String toString() {
+        return "ConnectionInfo{" +
+                "socketAddress=" + socketAddress +
+                '}';
+    }
 }
