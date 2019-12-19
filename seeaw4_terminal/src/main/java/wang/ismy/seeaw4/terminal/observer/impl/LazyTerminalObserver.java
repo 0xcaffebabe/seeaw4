@@ -9,7 +9,8 @@ import wang.ismy.seeaw4.terminal.observer.TerminalObserver;
  * @author MY
  * @date 2019/12/14 15:47
  */
-public class LazyTerminalObserver implements TerminalObserver {
+public abstract class LazyTerminalObserver implements TerminalObserver {
+
     private static final int DELAY = 200;
     private static final int MIN_LENGTH = 10;
     private static final String ID = "0xcaffebabe-lazyTerminalObserver";
@@ -37,9 +38,7 @@ public class LazyTerminalObserver implements TerminalObserver {
         });
     }
 
-    public void onMessage(String msg) {
-        System.out.print("延迟接收到:"+msg);
-    }
+    public abstract void onMessage(String msg);
 
     @Override
     public void onError(Throwable throwable) {

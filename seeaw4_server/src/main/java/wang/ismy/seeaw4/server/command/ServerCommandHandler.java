@@ -34,13 +34,25 @@ public class ServerCommandHandler implements CommandHandler {
                 return getClientList(connection, commandMessage);
             // 服务端如果接收到screen请求，那服务端要去发起客户端指定的另一个客户端的screen请求
             case SCREEN:
-                return screen(connection, commandMessage);
+                return sendMsgAndCallback(connection, commandMessage,CommandType.SCREEN);
+            // 服务端如果接收到photo请求，那服务端要去发起客户端指定的另一个客户端的photo请求
+            case PHOTO:
+                return sendMsgAndCallback(connection, commandMessage,CommandType.PHOTO);
+            case SHELL_BUFFER:
+                return sendMsgAndCallback(connection, commandMessage,CommandType.SHELL_BUFFER);
             default:
                 return null;
         }
     }
 
-    private Message screen(Connection connection, CommandMessage commandMessage) {
+    /**
+     * 向commandMessage指定的客户端发送一条控制消息
+     * 并且等待指定的客户端返回消息将返回的消息发送给connection
+     * @param connection
+     * @param commandMessage
+     * @return
+     */
+    private Message sendMsgAndCallback(Connection connection, CommandMessage commandMessage,CommandType commandType) {
         // connection 是主控方
         // success回调中的conn是被控方
         // 所以需要把被控方发来的消息发送给主控方
@@ -50,7 +62,7 @@ public class ServerCommandHandler implements CommandHandler {
         }
         String perId = o.toString();
         CommandMessage clientCmd = new CommandMessage();
-        clientCmd.setCommand(CommandType.SCREEN);
+        clientCmd.setCommand(commandType);
         new ConnectionPromise(clientCmd)
                 .success((conn, msg) -> {
                     // 获取主控方的回调id

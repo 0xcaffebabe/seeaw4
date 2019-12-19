@@ -11,6 +11,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * 一个回调控制对象，通过该对象包装消息
+ * 该对象会向消息写入一个回调ID，这样，当外部消息发进来时，如果外部消息带有回调ID
+ * 则该对象的回调函数会被调用
  * @author MY
  * @date 2019/12/16 21:52
  */

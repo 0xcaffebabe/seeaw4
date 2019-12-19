@@ -22,14 +22,18 @@ import java.nio.charset.CharsetEncoder;
  */
 public class CommonTerminal extends Terminal {
 
-    private final Process process;
-    private final InputStream inputStream;
-    private final OutputStream outputStream;
-    private final Camera camera = new WebCamera();
-    private final Desktop desktop;
+    private  Process process;
+    private  InputStream inputStream;
+    private  OutputStream outputStream;
+    private  Camera camera = new WebCamera();
+    private  Desktop desktop;
     private final Charset charset = Charset.forName(System.getProperty("sun.jnu.encoding"));
 
     public CommonTerminal(ShellType type) throws IOException {
+        init(type);
+    }
+
+    private void init(ShellType type) throws IOException{
         ProcessBuilder processBuilder = new ProcessBuilder()
                 .command(type.getShellName())
                 .redirectErrorStream(true);
@@ -48,6 +52,16 @@ public class CommonTerminal extends Terminal {
         }
 
         run();
+    }
+
+    public CommonTerminal() throws IOException {
+        ShellType shellType;
+        if (OsUtils.getOS().equals(OsUtils.WIN)){
+            shellType = ShellType.POWER_SHELL;
+        }else {
+            shellType = ShellType.BASH;
+        }
+        init(shellType);
     }
 
     private void run() {
