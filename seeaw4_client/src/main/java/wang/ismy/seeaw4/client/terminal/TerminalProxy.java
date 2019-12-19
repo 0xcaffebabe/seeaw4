@@ -9,6 +9,7 @@ import wang.ismy.seeaw4.common.message.impl.CommandMessage;
 import wang.ismy.seeaw4.common.message.impl.ImgMessage;
 import wang.ismy.seeaw4.common.message.impl.TextMessage;
 import wang.ismy.seeaw4.common.promise.ConnectionPromise;
+import wang.ismy.seeaw4.common.utils.BytesUtils;
 import wang.ismy.seeaw4.terminal.Resolution;
 import wang.ismy.seeaw4.terminal.Terminal;
 import wang.ismy.seeaw4.terminal.TerminalBuffer;
@@ -54,8 +55,7 @@ public class TerminalProxy extends Terminal {
         bind();
     }
 
-    public TerminalProxy() {
-    }
+    public TerminalProxy() { }
 
     public void setConnection(Connection connection) {
         this.connection = connection;
@@ -91,12 +91,10 @@ public class TerminalProxy extends Terminal {
     }
 
     private void bindComplete() {
-
         log.info("终端绑定成功，remote:{}", remoteClientId);
         // 连接成功刷新terminal buffer
         refreshTerminalBuffer();
-        // 获取摄像头
-        log.info("摄像头数据:{}", Arrays.toString(getCamera().getCameraSnapshot(ImgType.PNG,new Resolution(640,480))));
+
     }
 
     @Override
@@ -124,8 +122,8 @@ public class TerminalProxy extends Terminal {
                             if (msg instanceof ImgMessage){
                                 log.info("remote camera 接收到数据,{}",msg);
                                 bytes= msg.getPayload();
-
                             }
+                            log.info("lock count");
                             latch.countDown();
                         }).async();
                 try {
@@ -133,11 +131,13 @@ public class TerminalProxy extends Terminal {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                log.info("camera lock");
                 try {
                     latch.await();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+                log.info("camera unlock");
                 return bytes;
             }
         }
@@ -146,9 +146,68 @@ public class TerminalProxy extends Terminal {
 
     @Override
     public Desktop getDesktop() {
-        return null;
+        class  RemoteDesktop implements Desktop{
+            private byte[] bytes;
+            @Override
+            public byte[] getScreen(ImgType imgType, Resolution resolution) {
+                final CountDownLatch latch = new CountDownLatch(1);
+                CommandMessage cmd = new CommandMessage();
+                cmd.setCommand(CommandType.SCREEN);
+                cmd.addAddition(CommandKey.PER_ID,remoteClientId);
+                new ConnectionPromise(cmd)
+                        .success((conn,msg)->{
+                            if (msg instanceof ImgMessage){
+                                log.info("remote desktop 接收到数据,{}",msg);
+                                bytes= msg.getPayload();
+                            }
+                            log.info("lock count");
+                            latch.countDown();
+                        }).async();
+                try {
+                    connection.sendMessage(cmd);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                log.info("desktop lock");
+                try {
+                    latch.await();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                log.info("desktop unlock");
+                return bytes;
+            }
+        }
+        return new RemoteDesktop();
     }
 
+    @Override
+    public String getTerminalBuffer() {
+        final  CountDownLatch latch = new CountDownLatch(1);
+        CommandMessage cmd = new CommandMessage();
+        cmd.setCommand(CommandType.SHELL_BUFFER);
+        cmd.addAddition(CommandKey.PER_ID, remoteClientId);
+        new ConnectionPromise(cmd)
+                .success((conn, msg) -> {
+                    if (msg instanceof TextMessage) {
+                        terminalBuffer = new TerminalBuffer(1024);
+                        terminalBuffer.append(((TextMessage) msg).getText());
+                    }
+                    latch.countDown();
+                }).async();
+
+        try {
+            connection.sendMessage(cmd);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return terminalBuffer.getBuffer();
+    }
 
     public  void refreshTerminalBuffer() {
         CommandMessage cmd = new CommandMessage();

