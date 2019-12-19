@@ -22,15 +22,11 @@ import wang.ismy.seeaw4.common.utils.JsonUtils;
 import wang.ismy.seeaw4.terminal.Terminal;
 import wang.ismy.seeaw4.terminal.enums.ShellType;
 import wang.ismy.seeaw4.terminal.impl.CommonTerminal;
+import wang.ismy.seeaw4.terminal.observer.impl.LazyTerminalObserver;
 
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+
 import java.io.IOException;
-import java.lang.reflect.Member;
+
 import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
@@ -42,6 +38,7 @@ public class Client {
     private Connection connection;
     private ConnectionListener connectionListener;
     private Terminal terminal;
+    private TerminalProxy terminalProxy;
 
     public Client() {
         try {
@@ -49,6 +46,7 @@ public class Client {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        terminalProxy = new TerminalProxy();
     }
 
     public void setConnectionListener(ConnectionListener listener) {
@@ -59,7 +57,7 @@ public class Client {
     public void init() {
         // 注册消息处理链
         MessageService.getInstance().registerMessageChain(new PrintMessageChain()
-                , PromiseMessageChain.getInstance(),new ClientCommandMessageChain(terminal));
+                , PromiseMessageChain.getInstance(),new ClientCommandMessageChain(terminal,terminalProxy));
         // 连接服务端
         NettyClientConnection connection = new NettyClientConnection("127.0.0.1", 1999);
         connection.bindConnectionListener(connectionListener);
@@ -67,6 +65,7 @@ public class Client {
         connection.connect();
         this.connection = connection;
         clientService = new ClientService(connection);
+        terminalProxy.setConnection(connection);
     }
 
     public static void main(String[] args) throws IOException {
@@ -83,7 +82,7 @@ public class Client {
                             }.getType());
                             System.out.println("在线客户列表:" + list);
                             Per self = list.stream().filter(Per::isSelf).collect(Collectors.toList()).get(0);
-
+                            client.terminalProxy.setSelfId(self.getId());
                         }
                     });
 
@@ -98,13 +97,21 @@ public class Client {
             }
         });
         client.init();
+        client.terminalProxy.registerObserver(new LazyTerminalObserver() {
+            @Override
+            public void onMessage(String msg) {
+                System.err.print(msg);
+            }
+        });
         Scanner scanner = new Scanner(System.in);
-        try {
-            TerminalProxy terminalProxy = new TerminalProxy(client.connection,scanner.nextLine(),scanner.nextLine());
-            Thread.sleep(2000);
-            terminalProxy.input("uptime");
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+        while (scanner.hasNextLine()){
+            String str = scanner.nextLine();
+            if (str.contains("-")){
+                client.terminalProxy.setRemoteClientId(str);
+                client.terminalProxy.bind();
+            }else{
+                client.terminalProxy.input(str);
+            }
         }
         System.in.read();
 

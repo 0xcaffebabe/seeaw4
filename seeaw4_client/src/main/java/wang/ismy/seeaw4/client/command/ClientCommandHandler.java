@@ -1,5 +1,6 @@
 package wang.ismy.seeaw4.client.command;
 
+import wang.ismy.seeaw4.client.terminal.TerminalProxy;
 import wang.ismy.seeaw4.common.command.CommandHandler;
 import wang.ismy.seeaw4.common.command.CommandKey;
 import wang.ismy.seeaw4.common.command.CommandType;
@@ -22,10 +23,7 @@ import java.io.IOException;
 public class ClientCommandHandler implements CommandHandler {
 
     private Terminal terminal;
-
-    public ClientCommandHandler(Terminal terminal) {
-        this.terminal = terminal;
-    }
+    private TerminalProxy terminalProxy;
 
     @Override
     public Message process(Connection connection, CommandMessage commandMessage) {
@@ -39,7 +37,8 @@ public class ClientCommandHandler implements CommandHandler {
             case SHELL_BIND:
                 return shellBind(connection,commandMessage);
             case SHELL_RECEIVE:
-                System.out.println("shell receive:"+new String(commandMessage.getPayload()));
+                // 通知终端代理
+                terminalProxy.onMessage(new String(commandMessage.getPayload()));
                 return null;
             case SHELL_CMD:
                 try {
@@ -51,6 +50,11 @@ public class ClientCommandHandler implements CommandHandler {
             default:
                 return null;
         }
+    }
+
+    public ClientCommandHandler(Terminal terminal, TerminalProxy terminalProxy) {
+        this.terminal = terminal;
+        this.terminalProxy = terminalProxy;
     }
 
     private Message shellBind(Connection connection, CommandMessage commandMessage) {

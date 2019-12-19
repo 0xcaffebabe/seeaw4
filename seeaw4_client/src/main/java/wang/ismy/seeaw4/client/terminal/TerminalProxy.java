@@ -6,16 +6,25 @@ import wang.ismy.seeaw4.common.command.CommandKey;
 import wang.ismy.seeaw4.common.command.CommandType;
 import wang.ismy.seeaw4.common.connection.Connection;
 import wang.ismy.seeaw4.common.message.impl.CommandMessage;
+import wang.ismy.seeaw4.common.message.impl.ImgMessage;
 import wang.ismy.seeaw4.common.message.impl.TextMessage;
+import wang.ismy.seeaw4.common.promise.ConnectionPromise;
+import wang.ismy.seeaw4.terminal.Resolution;
 import wang.ismy.seeaw4.terminal.Terminal;
+import wang.ismy.seeaw4.terminal.TerminalBuffer;
 import wang.ismy.seeaw4.terminal.camera.Camera;
 import wang.ismy.seeaw4.terminal.desktop.Desktop;
+import wang.ismy.seeaw4.terminal.enums.ImgType;
 
 import java.io.IOException;
+import java.net.ConnectException;
+import java.util.Arrays;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * 远程终端代理，可以通过此对象，访问远程终端
  * 以及远程终端可以回调此对象
+ *
  * @author my
  */
 @Slf4j
@@ -26,8 +35,16 @@ public class TerminalProxy extends Terminal {
     private String remoteClientId;
     private String selfId;
 
-    public TerminalProxy(Connection connection,String remoteClientId,String selfId) throws IOException {
-        if (connection == null){
+    /**
+     * 该构造器调用后悔自动绑定
+     *
+     * @param connection
+     * @param remoteClientId
+     * @param selfId
+     * @throws IOException
+     */
+    public TerminalProxy(Connection connection, String remoteClientId, String selfId) throws IOException {
+        if (connection == null) {
             throw new IllegalStateException("connection 不得为null");
         }
         this.connection = connection;
@@ -37,23 +54,49 @@ public class TerminalProxy extends Terminal {
         bind();
     }
 
-    private void bind() throws IOException{
+    public TerminalProxy() {
+    }
+
+    public void setConnection(Connection connection) {
+        this.connection = connection;
+        this.clientService = new ClientService(connection);
+    }
+
+    public void setRemoteClientId(String remoteClientId) {
+        this.remoteClientId = remoteClientId;
+    }
+
+    public void setSelfId(String selfId) {
+        this.selfId = selfId;
+    }
+
+    @Override
+    public void onMessage(String msg) {
+        super.onMessage(msg);
+    }
+
+    public void bind() throws IOException {
         CommandMessage cmd = new CommandMessage();
         cmd.setCommand(CommandType.SHELL_BIND);
-        cmd.addAddition(CommandKey.PER_ID,remoteClientId);
-        cmd.addAddition(CommandKey.SELF_ID,selfId);
-        clientService.sendCallbackMessage(cmd,(conn,msg)->{
-            if (msg instanceof TextMessage){
+        cmd.addAddition(CommandKey.PER_ID, remoteClientId);
+        cmd.addAddition(CommandKey.SELF_ID, selfId);
+        clientService.sendCallbackMessage(cmd, (conn, msg) -> {
+            if (msg instanceof TextMessage) {
                 String text = ((TextMessage) msg).getText();
-                if ("绑定成功".equals(text)){
+                if ("绑定成功".equals(text)) {
                     bindComplete();
                 }
             }
         });
     }
 
-    private void bindComplete(){
-        log.info("终端绑定成功，remote:{}",remoteClientId);
+    private void bindComplete() {
+
+        log.info("终端绑定成功，remote:{}", remoteClientId);
+        // 连接成功刷新terminal buffer
+        refreshTerminalBuffer();
+        // 获取摄像头
+        log.info("摄像头数据:{}", Arrays.toString(getCamera().getCameraSnapshot(ImgType.PNG,new Resolution(640,480))));
     }
 
     @Override
@@ -61,18 +104,67 @@ public class TerminalProxy extends Terminal {
         CommandMessage cmdMsg = new CommandMessage();
         cmdMsg.setCommand(CommandType.SHELL_CMD);
         cmdMsg.setPayload(cmd.getBytes());
-        cmdMsg.addAddition(CommandKey.PER_ID,remoteClientId);
-        cmdMsg.addAddition(CommandKey.SELF_ID,selfId);
+        cmdMsg.addAddition(CommandKey.PER_ID, remoteClientId);
+        cmdMsg.addAddition(CommandKey.SELF_ID, selfId);
         connection.sendMessage(cmdMsg);
     }
 
     @Override
     public Camera getCamera() {
-        return null;
+        class RemoteCamera implements Camera{
+            private byte[] bytes;
+            @Override
+            public byte[] getCameraSnapshot(ImgType type, Resolution resolution) {
+                final CountDownLatch latch = new CountDownLatch(1);
+                CommandMessage cmd = new CommandMessage();
+                cmd.setCommand(CommandType.PHOTO);
+                cmd.addAddition(CommandKey.PER_ID,remoteClientId);
+                new ConnectionPromise(cmd)
+                        .success((conn,msg)->{
+                            if (msg instanceof ImgMessage){
+                                log.info("remote camera 接收到数据,{}",msg);
+                                bytes= msg.getPayload();
+
+                            }
+                            latch.countDown();
+                        }).async();
+                try {
+                    connection.sendMessage(cmd);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    latch.await();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                return bytes;
+            }
+        }
+        return new RemoteCamera();
     }
 
     @Override
     public Desktop getDesktop() {
         return null;
+    }
+
+
+    public  void refreshTerminalBuffer() {
+        CommandMessage cmd = new CommandMessage();
+        cmd.setCommand(CommandType.SHELL_BUFFER);
+        cmd.addAddition(CommandKey.PER_ID, remoteClientId);
+        new ConnectionPromise(cmd)
+                .success((conn, msg) -> {
+                    if (msg instanceof TextMessage) {
+                        terminalBuffer.append(((TextMessage) msg).getText());
+                        onMessage(((TextMessage) msg).getText());
+                    }
+                }).async();
+        try {
+            connection.sendMessage(cmd);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

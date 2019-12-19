@@ -27,7 +27,12 @@ public abstract class Terminal {
         if (terminalObserver != null){
             terminalObserver.onMessage(msg);
         }
+    }
 
+    protected void onMessage(String msg){
+        for(int i=0;i<msg.length();i++){
+            onMessage(msg.charAt(i));
+        }
     }
 
     protected void onError(Throwable throwable){terminalObserver.onError(throwable);}
