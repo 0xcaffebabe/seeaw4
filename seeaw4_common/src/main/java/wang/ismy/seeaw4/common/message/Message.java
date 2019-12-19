@@ -48,6 +48,15 @@ public abstract class Message{
 		return addition;
 	}
 
+	public Message addAddition(String key,Object value){
+		addition.put(key,value);
+		return this;
+	}
+
+	public Object getAddition(String key){
+		return addition.get(key);
+	}
+
 	@Override
 	public String toString() {
 		return "Message{" +

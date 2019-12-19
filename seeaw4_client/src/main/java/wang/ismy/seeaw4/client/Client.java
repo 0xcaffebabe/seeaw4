@@ -4,6 +4,7 @@ import com.google.gson.reflect.TypeToken;
 import lombok.extern.slf4j.Slf4j;
 import wang.ismy.seeaw4.client.message.chain.ClientCommandMessageChain;
 import wang.ismy.seeaw4.client.netty.NettyClientConnection;
+import wang.ismy.seeaw4.client.terminal.TerminalProxy;
 import wang.ismy.seeaw4.common.client.Per;
 import wang.ismy.seeaw4.common.command.CommandKey;
 import wang.ismy.seeaw4.common.command.CommandType;
@@ -81,10 +82,11 @@ public class Client {
                             List<Per> list = JsonUtils.fromJson(((TextMessage) message).getText(), new TypeToken<List<Per>>() {
                             }.getType());
                             System.out.println("在线客户列表:" + list);
+                            Per self = list.stream().filter(Per::isSelf).collect(Collectors.toList()).get(0);
+
                         }
                     });
-                    TextMessage msg = new TextMessage("你好，服务端");
-                    connection.sendMessage(msg);
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -96,38 +98,16 @@ public class Client {
             }
         });
         client.init();
-
         Scanner scanner = new Scanner(System.in);
-        while (scanner.hasNextLine()){
-            String id = scanner.nextLine();
-            CommandMessage cmd = new CommandMessage();
-            if (id.contains("-")){
-                // 发起一条shell_bind
-                cmd.setCommand(CommandType.SHELL_BIND);
-                cmd.addition().put(CommandKey.PER_ID,id);
-                cmd.addition().put(CommandKey.SELF_ID,scanner.nextLine());
-                client.clientService.sendCallbackMessage(cmd,(conn,msg)->{
-                    log.info("接收到shell bind 回调,{}",msg);
-                    if (msg instanceof TextMessage){
-                        if ("绑定成功".equals(((TextMessage) msg).getText())){
-                            // 发起一条shell_cmd
-                            cmd.setCommand(CommandType.SHELL_CMD);
-                            cmd.setPayload("uptime".getBytes());
-                            try {
-                                client.connection.sendMessage(cmd);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                    }
-
-                });
-
-
-            }
-
+        try {
+            TerminalProxy terminalProxy = new TerminalProxy(client.connection,scanner.nextLine(),scanner.nextLine());
+            Thread.sleep(2000);
+            terminalProxy.input("uptime");
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
         }
+        System.in.read();
+
     }
 
 
