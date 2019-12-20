@@ -69,7 +69,7 @@ public class Client {
         MessageService.getInstance().registerMessageChain(new PrintMessageChain()
                 , PromiseMessageChain.getInstance(),new ClientCommandMessageChain(terminal,terminalProxy));
         // 连接服务端
-        NettyClientConnection connection = new NettyClientConnection("127.0.0.1", 1999);
+        NettyClientConnection connection = new NettyClientConnection("my-pc", 1999);
         connection.bindConnectionListener(connectionListener);
         // 向连接设置客户自定义的连接监听器
         connection.connect();
