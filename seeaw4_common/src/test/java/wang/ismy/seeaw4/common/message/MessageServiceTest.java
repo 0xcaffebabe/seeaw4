@@ -8,6 +8,7 @@ import wang.ismy.seeaw4.common.message.impl.TextMessage;
 import wang.ismy.seeaw4.common.utils.BytesUtils;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.*;
@@ -34,7 +35,9 @@ public class MessageServiceTest {
     @Test
     public void resolve(){
         MessageService messageService = MessageService.getInstance();
-        Message msg = new TextMessage("text".getBytes(), Map.of("name","july"));
+        Map<String,Object> map = new HashMap<>();
+        map.put("name","july");
+        Message msg = new TextMessage("text".getBytes(),map);
         byte[] build = messageService.build(msg);
         Message resolve = messageService.resolve(build);
         assertEquals(resolve, msg);

@@ -12,7 +12,6 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.timeout.IdleStateHandler;
-import jdk.dynalink.linker.TypeBasedGuardingDynamicLinker;
 import lombok.extern.slf4j.Slf4j;
 import wang.ismy.seeaw4.common.Connector;
 import wang.ismy.seeaw4.common.ExecuteService;
@@ -75,7 +74,7 @@ public class NettyConnector implements Connector, ChannelListener, MessageListen
                         .channel(NioServerSocketChannel.class)
 
                         // 业务处理
-                        .childHandler(new ChannelInitializer<>() {
+                        .childHandler(new ChannelInitializer<Channel>() {
                             @Override
                             protected void initChannel(Channel channel) throws Exception {
                                 ByteBuf delimiter = Unpooled.copiedBuffer("$_0xca".getBytes());

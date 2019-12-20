@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import wang.ismy.seeaw4.common.message.MessageType;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.*;
@@ -12,7 +13,12 @@ public class TextMessageTest {
 
     private TextMessage textMessage;
     private String str = "test str";
-    private Map<String,Object> additions = Map.of("charset","utf-8","length",15);
+    private Map<String,Object> additions ;
+    {
+        additions = new HashMap<>();
+        additions.put("charset","utf-8");
+        additions.put("length",15);
+    }
 
     @Before
     public void before(){
@@ -31,6 +37,10 @@ public class TextMessageTest {
 
     @Test
     public void addition() {
-        assertEquals(Map.of("charset","utf-8","length",15),textMessage.addition());
+        Map<String,Object> additions = new HashMap<>();
+        additions = new HashMap<>();
+        additions.put("charset","utf-8");
+        additions.put("length",15);
+        assertEquals(additions,textMessage.addition());
     }
 }
