@@ -13,6 +13,7 @@
         <module>seeaw4_client</module>
         <module>seeaw4_server</module>
         <module>seeaw4_terminal</module>
+        <module>seeaw4_desktop</module>
     </modules>
 
     <dependencies>

@@ -100,7 +100,6 @@ public class Client {
             }
         }
         System.in.read();
-
     }
 
 
@@ -110,6 +109,13 @@ public class Client {
 
     public void onClientListChange(List<Per> clientList){
         System.out.println("客户端列表发生变化:"+clientList);
+        // 更新selfid
+        for (Per per : clientList) {
+            if (per.isSelf()){
+                terminalProxy.setSelfId(per.getId());
+                break;
+            }
+        }
         this.clientList = clientList;
     }
 }

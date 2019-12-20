@@ -8,6 +8,7 @@ import wang.ismy.seeaw4.common.promise.ConnectionPromise;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.*;
@@ -40,8 +41,10 @@ public class PromiseMessageChainTest {
         instance.registerPromise(promise);
         Connection connection = Mockito.mock(Connection.class);
         Message message = Mockito.mock(Message.class);
+        Map<String,Object> map = new HashMap<>();
+        map.put("promise_callback","id");
         Mockito.when(message.addition())
-                .thenReturn(Map.of("promise_callback","id"));
+                .thenReturn(map);
 
         instance.process(connection,message);
 
