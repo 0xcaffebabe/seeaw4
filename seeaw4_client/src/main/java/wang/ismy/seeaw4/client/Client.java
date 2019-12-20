@@ -1,46 +1,33 @@
 package wang.ismy.seeaw4.client;
 
-import com.google.gson.reflect.TypeToken;
 import lombok.extern.slf4j.Slf4j;
 import wang.ismy.seeaw4.client.message.chain.ClientCommandMessageChain;
 import wang.ismy.seeaw4.client.netty.NettyClientConnection;
 import wang.ismy.seeaw4.client.terminal.TerminalProxy;
 import wang.ismy.seeaw4.common.client.Per;
-import wang.ismy.seeaw4.common.command.CommandKey;
-import wang.ismy.seeaw4.common.command.CommandType;
 import wang.ismy.seeaw4.common.connection.Connection;
 import wang.ismy.seeaw4.common.connection.ConnectionListener;
-import wang.ismy.seeaw4.common.message.Message;
 import wang.ismy.seeaw4.common.message.MessageService;
 import wang.ismy.seeaw4.common.message.chain.impl.PrintMessageChain;
 import wang.ismy.seeaw4.common.message.chain.impl.PromiseMessageChain;
-import wang.ismy.seeaw4.common.message.impl.CommandMessage;
-import wang.ismy.seeaw4.common.message.impl.ImgMessage;
-import wang.ismy.seeaw4.common.message.impl.TextMessage;
-import wang.ismy.seeaw4.common.promise.ConnectionPromise;
-import wang.ismy.seeaw4.common.utils.JsonUtils;
 import wang.ismy.seeaw4.common.utils.SwingUtils;
 import wang.ismy.seeaw4.terminal.Resolution;
 import wang.ismy.seeaw4.terminal.Terminal;
 import wang.ismy.seeaw4.terminal.camera.Camera;
 import wang.ismy.seeaw4.terminal.desktop.Desktop;
 import wang.ismy.seeaw4.terminal.enums.ImgType;
-import wang.ismy.seeaw4.terminal.enums.ShellType;
 import wang.ismy.seeaw4.terminal.impl.CommonTerminal;
 import wang.ismy.seeaw4.terminal.observer.impl.LazyTerminalObserver;
-
-
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import java.util.stream.Collectors;
 
+
+/**
+ * 客户端
+ * @author MY
+ */
 @Slf4j
 public class Client {
 
@@ -49,13 +36,16 @@ public class Client {
     private ConnectionListener connectionListener;
     private Terminal terminal;
     private TerminalProxy terminalProxy;
+    private List<Per> clientList = new ArrayList<>();
 
     public Client() {
+        // 创建一个本地终端
         try {
             terminal = new CommonTerminal();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        // 创建一个远程终端代理
         terminalProxy = new TerminalProxy();
     }
 
@@ -63,11 +53,10 @@ public class Client {
         connectionListener = listener;
     }
 
-
     public void init() {
         // 注册消息处理链
         MessageService.getInstance().registerMessageChain(new PrintMessageChain()
-                , PromiseMessageChain.getInstance(),new ClientCommandMessageChain(terminal,terminalProxy));
+                , PromiseMessageChain.getInstance(),new ClientCommandMessageChain(terminal,terminalProxy,this));
         // 连接服务端
         NettyClientConnection connection = new NettyClientConnection("100.64.131.96", 1999);
         connection.bindConnectionListener(connectionListener);
@@ -80,32 +69,6 @@ public class Client {
 
     public static void main(String[] args) throws IOException {
         Client client = new Client();
-        client.setConnectionListener(new ConnectionListener() {
-            @Override
-            public void establish(Connection connection) {
-                // 连接成功后从服务器拉取在线客户
-                try {
-                    client.clientService.selectClientList((connection1, message) -> {
-                        log.info("接收到查询在线列表回调");
-                        if (message instanceof TextMessage) {
-                            List<Per> list = JsonUtils.fromJson(((TextMessage) message).getText(), new TypeToken<List<Per>>() {
-                            }.getType());
-                            System.out.println("在线客户列表:" + list);
-                            Per self = list.stream().filter(Per::isSelf).collect(Collectors.toList()).get(0);
-                            client.terminalProxy.setSelfId(self.getId());
-                        }
-                    });
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void close(Connection connection) {
-
-            }
-        });
         client.init();
         client.terminalProxy.registerObserver(new LazyTerminalObserver() {
             @Override
@@ -143,5 +106,10 @@ public class Client {
 
     public Terminal getTerminal() {
         return terminal;
+    }
+
+    public void onClientListChange(List<Per> clientList){
+        System.out.println("客户端列表发生变化:"+clientList);
+        this.clientList = clientList;
     }
 }

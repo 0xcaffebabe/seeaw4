@@ -37,7 +37,7 @@ public class TerminalProxy extends Terminal {
     private String selfId;
 
     /**
-     * 该构造器调用后悔自动绑定
+     * 该构造器调用后会自动绑定
      *
      * @param connection
      * @param remoteClientId
