@@ -1,6 +1,9 @@
 package wang.ismy.seeaw4.client.command;
 
+import com.google.gson.reflect.TypeToken;
+import wang.ismy.seeaw4.client.Client;
 import wang.ismy.seeaw4.client.terminal.TerminalProxy;
+import wang.ismy.seeaw4.common.client.Per;
 import wang.ismy.seeaw4.common.command.CommandHandler;
 import wang.ismy.seeaw4.common.command.CommandKey;
 import wang.ismy.seeaw4.common.command.CommandType;
@@ -9,12 +12,14 @@ import wang.ismy.seeaw4.common.message.Message;
 import wang.ismy.seeaw4.common.message.impl.CommandMessage;
 import wang.ismy.seeaw4.common.message.impl.ImgMessage;
 import wang.ismy.seeaw4.common.message.impl.TextMessage;
+import wang.ismy.seeaw4.common.utils.JsonUtils;
 import wang.ismy.seeaw4.terminal.Resolution;
 import wang.ismy.seeaw4.terminal.Terminal;
 import wang.ismy.seeaw4.terminal.enums.ImgType;
 import wang.ismy.seeaw4.terminal.observer.impl.LazyTerminalObserver;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @author MY
@@ -24,10 +29,19 @@ public class ClientCommandHandler implements CommandHandler {
 
     private Terminal terminal;
     private TerminalProxy terminalProxy;
+    private Client client;
+
+    public ClientCommandHandler(Terminal terminal, TerminalProxy terminalProxy,Client client) {
+        this.terminal = terminal;
+        this.terminalProxy = terminalProxy;
+        this.client = client;
+    }
 
     @Override
     public Message process(Connection connection, CommandMessage commandMessage) {
         switch (commandMessage.getCommand()){
+            case LIST_CLIENT:
+                return clientList(connection, commandMessage);
             case SCREEN:
                 return screen(connection,commandMessage);
             case PHOTO:
@@ -50,11 +64,6 @@ public class ClientCommandHandler implements CommandHandler {
             default:
                 return null;
         }
-    }
-
-    public ClientCommandHandler(Terminal terminal, TerminalProxy terminalProxy) {
-        this.terminal = terminal;
-        this.terminalProxy = terminalProxy;
     }
 
     private Message shellBind(Connection connection, CommandMessage commandMessage) {
@@ -95,5 +104,13 @@ public class ClientCommandHandler implements CommandHandler {
     private Message shellBuffer(Connection connection,CommandMessage message){
 
         return new TextMessage(terminal.getTerminalBuffer());
+    }
+
+    private Message clientList(Connection connection,CommandMessage commandMessage){
+        String str = new String(commandMessage.getPayload());
+        List<Per> list = JsonUtils.fromJson(str, new TypeToken<List<Per>>() {
+        }.getType());;
+        client.onClientListChange(list);
+        return null;
     }
 }

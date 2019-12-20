@@ -48,7 +48,6 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
             log.info("连接主动关闭");
         }
 
-
     }
 
     public void setNettyConnection(NettyClientConnection connection){

@@ -1,5 +1,6 @@
 package wang.ismy.seeaw4.client.message.chain;
 
+import wang.ismy.seeaw4.client.Client;
 import wang.ismy.seeaw4.client.command.ClientCommandHandler;
 import wang.ismy.seeaw4.client.terminal.TerminalProxy;
 import wang.ismy.seeaw4.common.ExecuteService;
@@ -20,12 +21,9 @@ import java.io.IOException;
 public class ClientCommandMessageChain implements MessageChain {
     private ExecuteService executeService = ExecuteService.getInstance();
     private CommandHandler commandHandler;
-    private Terminal terminal;
-    private TerminalProxy terminalProxy;
-    public ClientCommandMessageChain(Terminal terminal, TerminalProxy terminalProxy){
-        this.terminal = terminal;
-        commandHandler = new ClientCommandHandler(terminal,terminalProxy);
-        this.terminalProxy = terminalProxy;
+
+    public ClientCommandMessageChain(Terminal terminal, TerminalProxy terminalProxy, Client client){
+        commandHandler = new ClientCommandHandler(terminal,terminalProxy,client);
     }
 
     @Override

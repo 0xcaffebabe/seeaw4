@@ -16,6 +16,8 @@ import jdk.dynalink.linker.TypeBasedGuardingDynamicLinker;
 import lombok.extern.slf4j.Slf4j;
 import wang.ismy.seeaw4.common.Connector;
 import wang.ismy.seeaw4.common.ExecuteService;
+import wang.ismy.seeaw4.common.client.Per;
+import wang.ismy.seeaw4.common.command.CommandType;
 import wang.ismy.seeaw4.common.connection.Connection;
 import wang.ismy.seeaw4.common.connection.ConnectionListener;
 import wang.ismy.seeaw4.common.message.Message;
@@ -24,14 +26,18 @@ import wang.ismy.seeaw4.common.message.MessageService;
 import wang.ismy.seeaw4.common.message.SelfMessageEncoder;
 import wang.ismy.seeaw4.common.message.chain.impl.PrintMessageChain;
 import wang.ismy.seeaw4.common.message.chain.impl.PromiseMessageChain;
+import wang.ismy.seeaw4.common.message.impl.CommandMessage;
+import wang.ismy.seeaw4.common.utils.JsonUtils;
 import wang.ismy.seeaw4.server.message.chain.ServerMessageChain;
 import wang.ismy.seeaw4.server.netty.ChannelListener;
 import wang.ismy.seeaw4.server.netty.NettyConnection;
 import wang.ismy.seeaw4.server.netty.NettyConnectionService;
 import wang.ismy.seeaw4.server.netty.NettyServerHandler;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * socket连接器
@@ -113,6 +119,7 @@ public class NettyConnector implements Connector, ChannelListener, MessageListen
         if (connectionListener != null){
             connectionListener.establish(connection);
         }
+        broadcast();
     }
 
     @Override
@@ -122,10 +129,35 @@ public class NettyConnector implements Connector, ChannelListener, MessageListen
         if (connectionListener != null){
             connectionListener.close(connection);
         }
+        broadcast();
     }
 
     @Override
     public void onMessage(Connection connection,Message message) {
         messageService.process(connection,message);
+    }
+
+    private void broadcast() {
+        executeService.excute(()->{
+
+            for (Connection conn : getConnectionList()) {
+                List<Per> collect = nettyConnectionService.getConnectionList().stream()
+                        .map(c -> {
+                            Per p = Per.convert(c);
+                            if (c.equals(conn)) {
+                                p.setSelf(true);
+                            }
+                            return p;
+                        }).collect(Collectors.toList());
+                CommandMessage cmd = new CommandMessage();
+                cmd.setPayload(JsonUtils.toJson(collect).getBytes());
+                cmd.setCommand(CommandType.LIST_CLIENT);
+                try {
+                    conn.sendMessage(cmd);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 }
