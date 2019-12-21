@@ -25,7 +25,10 @@ public class ClientView extends HBox {
     @FXML
     private Label label;
     @FXML
-    private ImageView img;
+    private ImageView screen;
+    @FXML
+    private ImageView camera;
+
     private Per per;
 
     public ClientView() {
@@ -41,8 +44,13 @@ public class ClientView extends HBox {
         }
     }
 
-    public void setImg(Image pic){
-        img.setImage(pic);
+    public void setScreen(Image pic){
+        screen.setImage(pic);
+        screen.setPreserveRatio(true);
+    }
+    public void setCamera(Image pic){
+        camera.setImage(pic);
+        camera.setPreserveRatio(true);
     }
 
     public void setClient(Per per){
