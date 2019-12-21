@@ -99,7 +99,7 @@ public class ClientCommandHandler implements CommandHandler {
     }
 
     private Message screen(Connection connection,CommandMessage message){
-        byte[] screen = terminal.getDesktop().getScreen(ImgType.JPEG, Resolution.getDefault());
+        byte[] screen = terminal.getDesktop().getScreen(ImgType.JPEG, new Resolution(1366,768));
         return new ImgMessage(screen,ImgType.JPEG.getFormat());
     }
 
