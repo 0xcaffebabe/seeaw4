@@ -70,6 +70,8 @@ public class ServerCommandHandler implements CommandHandler {
                     }
                     // 将回调id包装进一条消息，发送给主控方
                     msg.addition().put(PromiseMessageChain.PROMISE_CALLBACK, callbackId);
+                    // 同时也需要把被控方ID包装进消息，发送给主控方
+                    msg.addition().put(CommandKey.PER_ID, perId);
                     try {
                         connection.sendMessage(msg);
                     } catch (IOException e) {

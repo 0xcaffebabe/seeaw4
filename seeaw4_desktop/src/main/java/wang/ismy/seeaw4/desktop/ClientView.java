@@ -49,6 +49,9 @@ public class ClientView extends HBox {
         this.per = per;
         String str = "ID:"+per.getId()+"\n"+
                 "连接时间:"+ LocalDateTime.ofInstant(Instant.ofEpochMilli(per.getConnectTime()), TimeZone.getDefault().toZoneId());
+        if (per.isSelf()){
+            label.setStyle("-fx-background-color: red");
+        }
         label.setText(str);
     }
 

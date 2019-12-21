@@ -1,13 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-
-<?import com.jfoenix.controls.JFXButton?>
-<?import com.jfoenix.controls.JFXSpinner?>
 <?import com.jfoenix.controls.JFXTabPane?>
 <?import com.jfoenix.controls.JFXListView?>
 <?import wang.ismy.seeaw4.desktop.ClientView?>
@@ -15,7 +10,7 @@
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="wang.ismy.seeaw4.desktop.Controller"
             stylesheets="style.css"
-            prefHeight="400" prefWidth="600">
+            prefHeight="600" prefWidth="800">
     <JFXTabPane onMouseClicked="#init">
         <Tab text="在线用户">
             <JFXListView prefWidth="600" fx:id="listView" styleClass="mylistview"/>

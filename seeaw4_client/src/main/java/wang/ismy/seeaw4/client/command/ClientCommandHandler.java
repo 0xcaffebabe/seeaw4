@@ -2,6 +2,7 @@ package wang.ismy.seeaw4.client.command;
 
 import com.google.gson.reflect.TypeToken;
 import wang.ismy.seeaw4.client.Client;
+import wang.ismy.seeaw4.client.client.LocalPer;
 import wang.ismy.seeaw4.client.terminal.TerminalProxy;
 import wang.ismy.seeaw4.common.client.Per;
 import wang.ismy.seeaw4.common.command.CommandHandler;
@@ -20,6 +21,7 @@ import wang.ismy.seeaw4.terminal.observer.impl.LazyTerminalObserver;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author MY
@@ -28,12 +30,12 @@ import java.util.List;
 public class ClientCommandHandler implements CommandHandler {
 
     private Terminal terminal;
-    private TerminalProxy terminalProxy;
+    private List<LocalPer> localPerList;
     private Client client;
 
-    public ClientCommandHandler(Terminal terminal, TerminalProxy terminalProxy,Client client) {
+    public ClientCommandHandler(Terminal terminal, List<LocalPer> localPerList, Client client) {
         this.terminal = terminal;
-        this.terminalProxy = terminalProxy;
+        this.localPerList = localPerList;
         this.client = client;
     }
 
@@ -52,7 +54,12 @@ public class ClientCommandHandler implements CommandHandler {
                 return shellBind(connection,commandMessage);
             case SHELL_RECEIVE:
                 // 通知终端代理
-                terminalProxy.onMessage(new String(commandMessage.getPayload()));
+                Object o = commandMessage.getAddition(CommandKey.PER_ID);
+                if (o != null) {
+                    String perId = o.toString();
+                    LocalPer localPer = localPerList.stream().filter(l -> l.getId().equals(perId)).collect(Collectors.toList()).get(0);
+                    localPer.getTerminalProxy().onMessage(new String(commandMessage.getPayload()));
+                }
                 return null;
             case SHELL_CMD:
                 try {

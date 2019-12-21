@@ -1,8 +1,10 @@
 package wang.ismy.seeaw4.client;
 
 import lombok.extern.slf4j.Slf4j;
+import wang.ismy.seeaw4.client.client.LocalPer;
 import wang.ismy.seeaw4.client.message.chain.ClientCommandMessageChain;
 import wang.ismy.seeaw4.client.netty.NettyClientConnection;
+import wang.ismy.seeaw4.client.service.LocalPerService;
 import wang.ismy.seeaw4.client.terminal.TerminalProxy;
 import wang.ismy.seeaw4.common.client.Per;
 import wang.ismy.seeaw4.common.connection.Connection;
@@ -38,7 +40,10 @@ public class Client {
     private Terminal terminal;
     private TerminalProxy terminalProxy;
     private List<Per> clientList = new ArrayList<>();
+    private List<LocalPer> localPerList = new ArrayList<>();
+    private LocalPerService localPerService = LocalPerService.getInstance();
     private Consumer<List<Per>> listChangeListener;
+    private String selfId;
 
     public Client() {
         // 创建一个本地终端
@@ -58,7 +63,7 @@ public class Client {
     public void init() {
         // 注册消息处理链
         MessageService.getInstance().registerMessageChain(new PrintMessageChain()
-                , PromiseMessageChain.getInstance(),new ClientCommandMessageChain(terminal,terminalProxy,this));
+                , PromiseMessageChain.getInstance(),new ClientCommandMessageChain(terminal,localPerList,this));
         // 连接服务端
         NettyClientConnection connection = new NettyClientConnection("127.0.0.1", 1999);
         connection.bindConnectionListener(connectionListener);
@@ -104,7 +109,6 @@ public class Client {
         System.in.read();
     }
 
-
     public Terminal getTerminal() {
         return terminal;
     }
@@ -114,10 +118,28 @@ public class Client {
         // 更新selfid
         for (Per per : clientList) {
             if (per.isSelf()){
+                this.selfId = per.getId();
                 terminalProxy.setSelfId(per.getId());
                 break;
             }
         }
+        // 当客户端列表发生变更的时候，根据新的客户端列表创建本地客户端列表
+        localPerList = new ArrayList<>();
+        for (Per per : clientList) {
+            // 如果能在服务当中获取远程per的本地per,那就不创建
+            LocalPer localPer = localPerService.get(per.getId());
+            if (localPer != null){
+                localPerList.add(localPer);
+            }else{
+                try {
+                    localPer = new LocalPer(per,selfId,connection);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            localPerList.add(localPer);
+        }
+        System.out.println("本丢客户端列表:"+localPerList);
         this.clientList = clientList;
         // 通知监听者
         if (listChangeListener != null){
@@ -127,6 +149,10 @@ public class Client {
 
     public void setClientListChangeListener(Consumer<List<Per>> listener){
         this.listChangeListener = listener;
+    }
+
+    public List<LocalPer> getLocalPerList(){
+        return localPerList;
     }
 
     public TerminalProxy getTerminalProxy() {

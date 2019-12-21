@@ -1,13 +1,18 @@
 package wang.ismy.seeaw4.desktop;
 
 import com.jfoenix.controls.JFXListView;
+import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.image.Image;
 import wang.ismy.seeaw4.client.Client;
+import wang.ismy.seeaw4.client.client.LocalPer;
+import wang.ismy.seeaw4.client.terminal.TerminalProxy;
 import wang.ismy.seeaw4.common.ExecuteService;
 import wang.ismy.seeaw4.common.client.Per;
 import wang.ismy.seeaw4.terminal.Resolution;
+import wang.ismy.seeaw4.terminal.camera.Camera;
+import wang.ismy.seeaw4.terminal.desktop.Desktop;
 import wang.ismy.seeaw4.terminal.enums.ImgType;
 import wang.ismy.seeaw4.terminal.observer.impl.LazyTerminalObserver;
 
@@ -40,36 +45,29 @@ public class Controller {
         client.init();
     }
 
-    public void init(){
+    public void init() {
 
     }
 
-    private void renderClientList(List<Per> list){
+    private void renderClientList(List<Per> list) {
         System.out.println("client list render");
-        Platform.runLater(()->{
+        Platform.runLater(() -> {
             listView.getItems().clear();
-            for (Per per : list) {
+            List<LocalPer> localPerList = client.getLocalPerList();
+            for (LocalPer per : localPerList) {
                 ClientView clientView = new ClientView();
-                clientView.setClient(per);
-                if (!per.isSelf()){
-                    executeService.excute(()->{
-                        client.getTerminalProxy().setRemoteClientId(per.getId());
-                        client.getTerminalProxy().setBindSuccessListener(()->{
-                            byte[] bytes = client.getTerminalProxy().getCamera().getCameraSnapshot(ImgType.PNG, Resolution.getDefault());
-                            Platform.runLater(()->{
-                                ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
-                                clientView.setImg(new Image(bis));
-                            });
+                clientView.setClient(per.getPer());
+                // 显示画面
+                executeService.excute(()->{
+                    TerminalProxy terminalProxy = per.getTerminalProxy();
+                    if (terminalProxy != null) {
+                        Desktop desktop = terminalProxy.getDesktop();
+                        byte[] bytes = desktop.getScreen(null, null);
+                        Platform.runLater(()->{
+                            clientView.setImg(new Image(new ByteArrayInputStream(bytes)));
                         });
-                        try {
-                            client.getTerminalProxy().bind();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-
-
-                    });
-                }
+                    }
+                });
                 listView.getItems().add(clientView);
             }
         });

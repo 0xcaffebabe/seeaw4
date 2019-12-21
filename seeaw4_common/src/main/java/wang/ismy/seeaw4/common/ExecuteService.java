@@ -21,4 +21,8 @@ public class ExecuteService {
 
         return executeService;
     }
+
+    public static void excutes(Runnable runnable){
+        executeService.excute(runnable);
+    }
 }
