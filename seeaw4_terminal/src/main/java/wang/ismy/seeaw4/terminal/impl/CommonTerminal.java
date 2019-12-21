@@ -46,7 +46,7 @@ public class CommonTerminal extends Terminal {
                 desktop = new WindowsDesktop();
                 break;
             case NIX:
-                desktop = new LinuxDesktop();
+                desktop = new WindowsDesktop();
                 break;
             default:
                 desktop = null;
