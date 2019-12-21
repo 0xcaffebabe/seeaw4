@@ -26,7 +26,8 @@ public class CommonTerminal extends Terminal {
     private  InputStream inputStream;
     private  OutputStream outputStream;
     private  Camera camera = new WebCamera();
-    private  Desktop desktop;
+    private  Desktop desktop = new WindowsDesktop();
+
     private final Charset charset = Charset.forName(System.getProperty("sun.jnu.encoding"));
 
     public CommonTerminal(ShellType type) throws IOException {
@@ -98,13 +99,13 @@ public class CommonTerminal extends Terminal {
 
     @Override
     public Camera getCamera() {
-        return new WebCamera();
+        return camera;
     }
 
     @Override
     public Desktop getDesktop() {
 
-        return new WindowsDesktop();
+        return desktop;
 
     }
 

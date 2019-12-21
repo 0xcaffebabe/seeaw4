@@ -16,11 +16,10 @@ import java.io.IOException;
 public class WebCamera implements Camera {
 
     @Override
-    public byte[] getCameraSnapshot(ImgType imgType, Resolution resolution){
+    public synchronized byte[] getCameraSnapshot(ImgType imgType, Resolution resolution){
         Webcam webcam = Webcam.getDefault();
         webcam.setViewSize(new Dimension(resolution.getWidth(),resolution.getHeight()));
         webcam.open();
-
         ByteArrayOutputStream bos=new ByteArrayOutputStream();
         try {
             ImageIO.write(webcam.getImage(), imgType.getFormat(), bos);

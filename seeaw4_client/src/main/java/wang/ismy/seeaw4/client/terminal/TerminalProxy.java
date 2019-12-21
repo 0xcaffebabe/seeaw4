@@ -2,6 +2,7 @@ package wang.ismy.seeaw4.client.terminal;
 
 import lombok.extern.slf4j.Slf4j;
 import wang.ismy.seeaw4.client.ClientService;
+import wang.ismy.seeaw4.common.ExecuteService;
 import wang.ismy.seeaw4.common.command.CommandKey;
 import wang.ismy.seeaw4.common.command.CommandType;
 import wang.ismy.seeaw4.common.connection.Connection;
@@ -20,7 +21,9 @@ import wang.ismy.seeaw4.terminal.enums.ImgType;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.function.Consumer;
 
 /**
  * 远程终端代理，可以通过此对象，访问远程终端
@@ -35,6 +38,8 @@ public class TerminalProxy extends Terminal {
     private ClientService clientService;
     private String remoteClientId;
     private String selfId;
+    private Runnable bindSuccessListener;
+    private ExecuteService executeService = ExecuteService.getInstance();
 
     /**
      * 该构造器调用后会自动绑定
@@ -94,8 +99,19 @@ public class TerminalProxy extends Terminal {
         log.info("终端绑定成功，remote:{}", remoteClientId);
         // 连接成功刷新terminal buffer
         refreshTerminalBuffer();
-
+        // 通知监听者
+        if (bindSuccessListener != null){
+            executeService.excute(()->{
+                bindSuccessListener.run();
+            });
+        }
     }
+
+    public void setBindSuccessListener(Runnable listener){
+        this.bindSuccessListener = listener;
+    }
+
+
 
     @Override
     public void input(String cmd) throws IOException {
@@ -119,12 +135,12 @@ public class TerminalProxy extends Terminal {
                 cmd.addAddition(CommandKey.PER_ID,remoteClientId);
                 new ConnectionPromise(cmd)
                         .success((conn,msg)->{
-                            if (msg instanceof ImgMessage){
-                                log.info("remote camera 接收到数据,{}",msg);
-                                bytes= msg.getPayload();
-                            }
-                            log.info("lock count");
-                            latch.countDown();
+                                if (msg instanceof ImgMessage){
+                                    log.info("remote camera 接收到数据,{}",msg);
+                                    bytes= msg.getPayload();
+                                }
+                                log.info("lock count");
+                                latch.countDown();
                         }).async();
                 try {
                     connection.sendMessage(cmd);

@@ -19,7 +19,7 @@ import java.io.IOException;
 public class WindowsDesktop implements Desktop {
 
     @Override
-    public byte[] getScreen(ImgType imgType, Resolution resolution) {
+    public synchronized byte[] getScreen(ImgType imgType, Resolution resolution) {
         BufferedImage bfImage = null;
 
         try {

@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.function.Consumer;
 
 
 /**
@@ -37,6 +38,7 @@ public class Client {
     private Terminal terminal;
     private TerminalProxy terminalProxy;
     private List<Per> clientList = new ArrayList<>();
+    private Consumer<List<Per>> listChangeListener;
 
     public Client() {
         // 创建一个本地终端
@@ -117,5 +119,17 @@ public class Client {
             }
         }
         this.clientList = clientList;
+        // 通知监听者
+        if (listChangeListener != null){
+            listChangeListener.accept(clientList);
+        }
+    }
+
+    public void setClientListChangeListener(Consumer<List<Per>> listener){
+        this.listChangeListener = listener;
+    }
+
+    public TerminalProxy getTerminalProxy() {
+        return terminalProxy;
     }
 }
