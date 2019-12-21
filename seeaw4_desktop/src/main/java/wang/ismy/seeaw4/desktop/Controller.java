@@ -1,7 +1,6 @@
 package wang.ismy.seeaw4.desktop;
 
 import com.jfoenix.controls.JFXListView;
-import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.image.Image;
@@ -10,14 +9,11 @@ import wang.ismy.seeaw4.client.client.LocalPer;
 import wang.ismy.seeaw4.client.terminal.TerminalProxy;
 import wang.ismy.seeaw4.common.ExecuteService;
 import wang.ismy.seeaw4.common.client.Per;
-import wang.ismy.seeaw4.terminal.Resolution;
 import wang.ismy.seeaw4.terminal.camera.Camera;
 import wang.ismy.seeaw4.terminal.desktop.Desktop;
-import wang.ismy.seeaw4.terminal.enums.ImgType;
 import wang.ismy.seeaw4.terminal.observer.impl.LazyTerminalObserver;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.List;
 
 
@@ -62,9 +58,12 @@ public class Controller {
                     TerminalProxy terminalProxy = per.getTerminalProxy();
                     if (terminalProxy != null) {
                         Desktop desktop = terminalProxy.getDesktop();
-                        byte[] bytes = desktop.getScreen(null, null);
+                        Camera camera = terminalProxy.getCamera();
+                        byte[] screenBytes = desktop.getScreen(null, null);
+                        byte[] cameraBytes = camera.getCameraSnapshot(null, null);
                         Platform.runLater(()->{
-                            clientView.setImg(new Image(new ByteArrayInputStream(bytes)));
+                            clientView.setScreen(new Image(new ByteArrayInputStream(screenBytes)));
+                            clientView.setCamera(new Image(new ByteArrayInputStream(cameraBytes)));
                         });
                     }
                 });
