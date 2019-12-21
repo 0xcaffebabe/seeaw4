@@ -40,7 +40,7 @@ public class ImgMessage extends Message {
     public String toString() {
         return "ImgMessage{" +
                 "format='" + addition.get("format") + '\'' +
-                ", payload=" + Arrays.toString(payload) +
+                ", payload=" + payload.length +
                 ", addition=" + addition +
                 '}';
     }

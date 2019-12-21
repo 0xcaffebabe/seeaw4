@@ -124,8 +124,11 @@ public class Client {
             }
         }
         // 当客户端列表发生变更的时候，根据新的客户端列表创建本地客户端列表
-        localPerList = new ArrayList<>();
+        localPerList.clear();
         for (Per per : clientList) {
+            if (per.isSelf()){
+                continue;
+            }
             // 如果能在服务当中获取远程per的本地per,那就不创建
             LocalPer localPer = localPerService.get(per.getId());
             if (localPer != null){
@@ -139,7 +142,7 @@ public class Client {
             }
             localPerList.add(localPer);
         }
-        System.out.println("本丢客户端列表:"+localPerList);
+        System.out.println("本地客户端列表:"+localPerList);
         this.clientList = clientList;
         // 通知监听者
         if (listChangeListener != null){

@@ -52,7 +52,7 @@ public class Controller {
             List<LocalPer> localPerList = client.getLocalPerList();
             for (LocalPer per : localPerList) {
                 ClientView clientView = new ClientView();
-                clientView.setClient(per.getPer());
+                clientView.setClient(per);
                 // 显示画面
                 executeService.excute(()->{
                     TerminalProxy terminalProxy = per.getTerminalProxy();

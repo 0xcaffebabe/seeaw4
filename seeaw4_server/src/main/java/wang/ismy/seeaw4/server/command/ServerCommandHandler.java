@@ -80,6 +80,9 @@ public class ServerCommandHandler implements CommandHandler {
                 }).async();
         // 根据ID获取被控方连接
         Connection conn = connectionService.getConnectionById(perId);
+        if (clientCmd.getAddition(CommandKey.PER_ID) == null){
+            clientCmd.addAddition(CommandKey.PER_ID,connection.getInfo().getConnectionId());
+        }
         if (conn == null) {
             return new TextMessage("被控方不在线");
         }

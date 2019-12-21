@@ -55,10 +55,18 @@ public class ClientCommandHandler implements CommandHandler {
             case SHELL_RECEIVE:
                 // 通知终端代理
                 Object o = commandMessage.getAddition(CommandKey.PER_ID);
+                System.out.println("通知终端代理"+o);
                 if (o != null) {
                     String perId = o.toString();
-                    LocalPer localPer = localPerList.stream().filter(l -> l.getId().equals(perId)).collect(Collectors.toList()).get(0);
-                    localPer.getTerminalProxy().onMessage(new String(commandMessage.getPayload()));
+                    for (LocalPer localPer : localPerList) {
+                        if (localPer.getId().equals(perId)){
+                            System.out.println("通知终端sss");
+                            localPer.getTerminalProxy().onMessage(new String(commandMessage.getPayload()));
+                            break;
+                        }
+                    }
+
+
                 }
                 return null;
             case SHELL_CMD:
