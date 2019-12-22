@@ -60,7 +60,7 @@ public abstract class Message{
 	@Override
 	public String toString() {
 		return "Message{" +
-				"payload=" + Arrays.toString(payload) +
+				"payload=@" + payload.length +
 				", addition=" + addition +
 				'}';
 	}

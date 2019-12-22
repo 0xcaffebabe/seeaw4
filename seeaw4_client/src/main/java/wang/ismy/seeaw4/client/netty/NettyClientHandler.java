@@ -5,6 +5,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.timeout.IdleStateEvent;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.Buffer;
@@ -64,5 +65,28 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     public void setInitClose(boolean initClose) {
         isInitClose = initClose;
+    }
+
+    @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        System.out.println(evt);
+        if (evt instanceof IdleStateEvent){
+            IdleStateEvent event = (IdleStateEvent) evt;
+            switch (event.state()){
+                case READER_IDLE:
+                    log.info("{}读超时",ctx.channel());
+                    break;
+                case WRITER_IDLE:
+                    log.info("{}写超时",ctx.channel());
+                    break;
+                case ALL_IDLE:
+                    log.info("{}读写超时",ctx.channel());
+                    break;
+                default:
+                    break;
+            }
+        }else {
+            super.userEventTriggered(ctx, evt);
+        }
     }
 }

@@ -6,6 +6,7 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -19,6 +20,7 @@ import wang.ismy.seeaw4.common.message.MessageListener;
 import wang.ismy.seeaw4.common.message.MessageService;
 import wang.ismy.seeaw4.common.message.SelfMessageEncoder;
 import wang.ismy.seeaw4.common.message.chain.impl.PrintMessageChain;
+import wang.ismy.seeaw4.common.message.handler.IdleChannelHandler;
 import wang.ismy.seeaw4.common.message.impl.TextMessage;
 
 import java.io.IOException;

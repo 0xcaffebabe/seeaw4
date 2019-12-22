@@ -6,3 +6,9 @@ target
 *.class
 
 *.iml
+
+**/*.apk
+
+**/*.jar
+
+**/gradle
