@@ -56,4 +56,8 @@ public abstract class Terminal {
     public String getTerminalBuffer() {
         return terminalBuffer.getBuffer();
     }
+
+    public void close(){
+
+    }
 }

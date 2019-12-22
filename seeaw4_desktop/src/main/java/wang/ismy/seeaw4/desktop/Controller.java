@@ -2,8 +2,13 @@ package wang.ismy.seeaw4.desktop;
 
 import com.jfoenix.controls.JFXListView;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.image.Image;
+import javafx.scene.layout.AnchorPane;
+import javafx.stage.WindowEvent;
 import wang.ismy.seeaw4.client.Client;
 import wang.ismy.seeaw4.client.client.LocalPer;
 import wang.ismy.seeaw4.client.terminal.TerminalProxy;
@@ -14,7 +19,9 @@ import wang.ismy.seeaw4.terminal.desktop.Desktop;
 import wang.ismy.seeaw4.terminal.observer.impl.LazyTerminalObserver;
 
 import java.io.ByteArrayInputStream;
+import java.net.URL;
 import java.util.List;
+import java.util.ResourceBundle;
 
 
 /**
@@ -25,6 +32,9 @@ public class Controller {
 
     @FXML
     private JFXListView<ClientView> listView;
+
+    @FXML
+    private AnchorPane ap;
 
     private Client client;
     private ExecuteService executeService = ExecuteService.getInstance();
@@ -39,10 +49,6 @@ public class Controller {
         });
         client.setClientListChangeListener(this::renderClientList);
         client.init();
-    }
-
-    public void init() {
-
     }
 
     private void renderClientList(List<Per> list) {
@@ -72,4 +78,12 @@ public class Controller {
         });
 
     }
+
+    public void shutdown(){
+        System.out.println("client close");
+        if (client != null){
+            client.close();
+        }
+    }
+
 }

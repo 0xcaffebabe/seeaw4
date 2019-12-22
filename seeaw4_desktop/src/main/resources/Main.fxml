@@ -8,12 +8,12 @@
 <?import wang.ismy.seeaw4.desktop.ClientView?>
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="wang.ismy.seeaw4.desktop.Controller"
             stylesheets="style.css"
+            fx:id="ap"
             prefHeight="600" prefWidth="800">
-    <JFXTabPane onMouseClicked="#init">
+    <JFXTabPane>
         <Tab text="在线用户">
-            <JFXListView prefWidth="600" fx:id="listView" styleClass="mylistview"/>
+            <JFXListView prefWidth="800" prefHeight="600" fx:id="listView" styleClass="mylistview"/>
         </Tab>
         <Tab text="系统日志">
             <ClientView/>

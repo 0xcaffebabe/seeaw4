@@ -22,6 +22,10 @@ public class ExecuteService {
         return executeService;
     }
 
+    public void close(){
+        executors.shutdown();
+    }
+
     public static void excutes(Runnable runnable){
         executeService.excute(runnable);
     }

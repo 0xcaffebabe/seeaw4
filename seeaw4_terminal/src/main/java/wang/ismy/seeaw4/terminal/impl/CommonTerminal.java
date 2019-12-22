@@ -1,6 +1,7 @@
 package wang.ismy.seeaw4.terminal.impl;
 
 import com.github.sarxos.webcam.util.OsUtils;
+import sun.awt.SunHints;
 import wang.ismy.seeaw4.terminal.Terminal;
 import wang.ismy.seeaw4.terminal.camera.Camera;
 import wang.ismy.seeaw4.terminal.camera.WebCamera;
@@ -27,6 +28,7 @@ public class CommonTerminal extends Terminal {
     private  OutputStream outputStream;
     private  Camera camera = new WebCamera();
     private  Desktop desktop = new WindowsDesktop();
+    private volatile boolean closeFlag = false;
 
     private final Charset charset = Charset.forName(System.getProperty("sun.jnu.encoding"));
 
@@ -74,7 +76,7 @@ public class CommonTerminal extends Terminal {
             // file.encoding 与 sun.jnu.encoding的默认值都是系统编码
             InputStreamReader isr = new InputStreamReader(inputStream, charset);
             try {
-                while ((i = isr.read()) != -1) {
+                while ((i = isr.read()) != -1 || closeFlag) {
                     // 一旦有输出消息，就会立即发送给观察者
                     onMessage((char) i);
                 }
@@ -95,6 +97,11 @@ public class CommonTerminal extends Terminal {
         outputStream.write(bytes);
 
         outputStream.flush();
+    }
+
+    @Override
+    public void close() {
+        closeFlag = true;
     }
 
     @Override

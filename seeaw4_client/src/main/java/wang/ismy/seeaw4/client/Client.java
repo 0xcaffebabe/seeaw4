@@ -6,6 +6,7 @@ import wang.ismy.seeaw4.client.message.chain.ClientCommandMessageChain;
 import wang.ismy.seeaw4.client.netty.NettyClientConnection;
 import wang.ismy.seeaw4.client.service.LocalPerService;
 import wang.ismy.seeaw4.client.terminal.TerminalProxy;
+import wang.ismy.seeaw4.common.ExecuteService;
 import wang.ismy.seeaw4.common.client.Per;
 import wang.ismy.seeaw4.common.connection.Connection;
 import wang.ismy.seeaw4.common.connection.ConnectionListener;
@@ -160,5 +161,18 @@ public class Client {
 
     public TerminalProxy getTerminalProxy() {
         return terminalProxy;
+    }
+
+    public void close() {
+        // 关闭连接的同时还需要关闭线程池还有terminal
+        try {
+            connection.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        ExecuteService.getInstance().close();
+        terminal.close();
+        // 直接退出虚拟机
+        System.exit(0);
     }
 }
