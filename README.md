@@ -1,6 +1,8 @@
 
 ![](https://github.com/0xcaffebabe/seeaw4/workflows/Java%20CI/badge.svg)
 
+![](https://img.shields.io/badge/JDK-1.8-green)
+
 # SEEAW4
 
 - see anywhere 4.0 version
@@ -42,7 +44,11 @@
 
 - desktop
 
-构建一个跨平台的桌面客户端程序，可以独立运行
+构建一个跨平台(win,linux,osx)的桌面客户端程序，可以独立运行（该项目必须在JDK1.8下构建，如果使用的是openjdk，需要安装openjfx依赖）
+
+- android
+
+构建一个安卓客户端，功能同desktop
 
 - web
 
@@ -54,6 +60,26 @@
 
 ## 使用
 
-- 暂时还未开发完全
+执行构建
+
+```shell script
+mvn package
+```
+
+- 启动server
+
+```shell script
+java -jar ./seeaw4_server/target/seeaw4_server-1.0-SNAPSHOT-jar-with-dependencies.jar
+```
+
+
+
+
+
+
+
+
+
+
 
 
