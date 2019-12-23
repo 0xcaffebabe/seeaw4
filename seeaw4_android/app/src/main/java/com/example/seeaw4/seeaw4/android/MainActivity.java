@@ -16,6 +16,7 @@ import android.widget.TableLayout;
 import android.widget.Toast;
 
 import com.example.seeaw4.seeaw4.android.fragment.OnLineFragment;
+import com.example.seeaw4.seeaw4.android.fragment.SystemLogFragment;
 import com.google.android.material.tabs.TabLayout;
 
 import java.io.IOException;
@@ -38,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
 
         final List<Fragment> fragmentList = new ArrayList<>();
         fragmentList.add(new OnLineFragment());
-
+        fragmentList.add(new SystemLogFragment());
 
         viewPager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager()) {
             @Override
@@ -53,20 +54,20 @@ public class MainActivity extends AppCompatActivity {
         });
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.getTabAt(0).setText("在线用户");
-//        tabLayout.getTabAt(1).setText("系统日志");
+        tabLayout.getTabAt(1).setText("系统日志");
 
         try {
             CommonTerminal commonTerminal = new CommonTerminal(ShellType.ANDROID_SHELL);
             commonTerminal.registerObserver(new LazyTerminalObserver() {
                 @Override
                 public void onMessage(String s) {
-                    runOnUiThread(()->{
+                    runOnUiThread(() -> {
                         System.out.print(s);
-                        Toast.makeText(MainActivity.this,s,Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, s, Toast.LENGTH_SHORT).show();
                     });
                 }
             });
-//            commonTerminal.input("/system/bin/ping www.baidu.com");
+            commonTerminal.input("ls");
         } catch (IOException e) {
             e.printStackTrace();
         }
