@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
 
         final List<Fragment> fragmentList = new ArrayList<>();
         fragmentList.add(new OnLineFragment());
-        fragmentList.add(new OnLineFragment());
+
 
         viewPager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager()) {
             @Override
@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
         });
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.getTabAt(0).setText("在线用户");
-        tabLayout.getTabAt(1).setText("系统日志");
+//        tabLayout.getTabAt(1).setText("系统日志");
+
     }
 }

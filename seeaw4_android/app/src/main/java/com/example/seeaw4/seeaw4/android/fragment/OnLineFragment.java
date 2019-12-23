@@ -17,6 +17,7 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.SimpleCursorAdapter;
 
+import com.example.seeaw4.seeaw4.android.Controller;
 import com.example.seeaw4.seeaw4.android.MainActivity;
 import com.example.seeaw4.seeaw4.android.R;
 import com.example.seeaw4.seeaw4.android.view.ClientView;
@@ -57,6 +58,8 @@ public class OnLineFragment extends Fragment {
                 return list.get(position);
             }
         });
+
+        Controller controller = new Controller(listView);
 
         return view;
     }

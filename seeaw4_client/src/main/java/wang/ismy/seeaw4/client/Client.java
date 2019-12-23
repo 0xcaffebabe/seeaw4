@@ -5,6 +5,7 @@ import wang.ismy.seeaw4.client.client.LocalPer;
 import wang.ismy.seeaw4.client.message.chain.ClientCommandMessageChain;
 import wang.ismy.seeaw4.client.netty.NettyClientConnection;
 import wang.ismy.seeaw4.client.service.LocalPerService;
+import wang.ismy.seeaw4.client.terminal.MockTerminal;
 import wang.ismy.seeaw4.client.terminal.TerminalProxy;
 import wang.ismy.seeaw4.common.ExecuteService;
 import wang.ismy.seeaw4.common.client.Per;
@@ -45,6 +46,8 @@ public class Client {
     private LocalPerService localPerService = LocalPerService.getInstance();
     private Consumer<List<Per>> listChangeListener;
     private String selfId;
+    private String ip;
+    private int port;
 
     public Client() {
         // 创建一个本地终端
@@ -55,6 +58,24 @@ public class Client {
         }
         // 创建一个远程终端代理
         terminalProxy = new TerminalProxy();
+        this.ip="127.0.0.1";
+        this.port=1999;
+    }
+
+    public Client(String ip,int port){
+        this();
+        this.ip = ip;
+        this.port = port;
+    }
+
+    public Client(String ip,int port,boolean localTerminal){
+        if (!localTerminal){
+            terminal = new MockTerminal();
+        }
+        terminalProxy = new TerminalProxy();
+        this.ip=ip;
+        this.port=port;
+
     }
 
     public void setConnectionListener(ConnectionListener listener) {
@@ -66,7 +87,7 @@ public class Client {
         MessageService.getInstance().registerMessageChain(new PrintMessageChain()
                 , PromiseMessageChain.getInstance(),new ClientCommandMessageChain(terminal,localPerList,this));
         // 连接服务端
-        NettyClientConnection connection = new NettyClientConnection("100.64.137.37", 1999);
+        NettyClientConnection connection = new NettyClientConnection(ip, port);
         connection.bindConnectionListener(connectionListener);
         // 向连接设置客户自定义的连接监听器
         connection.connect();

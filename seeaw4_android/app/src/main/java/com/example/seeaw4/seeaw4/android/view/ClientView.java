@@ -1,6 +1,7 @@
 package com.example.seeaw4.seeaw4.android.view;
 
 import android.content.Context;
+import android.graphics.BitmapFactory;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;
@@ -10,6 +11,8 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 
 import com.example.seeaw4.seeaw4.android.R;
+
+import java.io.ByteArrayInputStream;
 
 public class ClientView extends LinearLayout {
 
@@ -43,5 +46,14 @@ public class ClientView extends LinearLayout {
 
     public void setCamera(){
         camera.setImageResource(R.drawable.ic_launcher_background);
+    }
+
+    public void setScreen(byte[] bytes){
+        ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
+        screen.setImageBitmap(BitmapFactory.decodeStream(bis));
+    }
+    public void setCamera(byte[] bytes){
+        ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
+        camera.setImageBitmap(BitmapFactory.decodeStream(bis));
     }
 }
