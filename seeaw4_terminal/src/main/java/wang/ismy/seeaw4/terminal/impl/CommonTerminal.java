@@ -30,13 +30,20 @@ public class CommonTerminal extends Terminal {
     private  Desktop desktop = new WindowsDesktop();
     private volatile boolean closeFlag = false;
 
-    private final Charset charset = Charset.forName(System.getProperty("sun.jnu.encoding"));
+    private  Charset charset ;
 
     public CommonTerminal(ShellType type) throws IOException {
         init(type);
     }
 
     private void init(ShellType type) throws IOException{
+        String str = System.getProperty("sun.jnu.encoding");
+        if (str == null || "".equals(str)){
+            str="utf-8";
+        }
+        charset = Charset.forName(str);
+
+
         ProcessBuilder processBuilder = new ProcessBuilder()
                 .command(type.getShellName())
                 .redirectErrorStream(true);
@@ -64,6 +71,7 @@ public class CommonTerminal extends Terminal {
         }else {
             shellType = ShellType.BASH;
         }
+
         init(shellType);
     }
 

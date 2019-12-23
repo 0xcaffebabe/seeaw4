@@ -24,7 +24,13 @@ public enum ShellType {
     /**
      * unix下的bash
      */
-    BASH(3,"bash");
+    BASH(3,"bash"),
+
+    /**
+     * android 下的shell
+     */
+    ANDROID_SHELL(4,"/system/bin/sh")
+    ;
 
     private int code;
     private String shellName;
