@@ -56,21 +56,21 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.getTabAt(0).setText("在线用户");
         tabLayout.getTabAt(1).setText("系统日志");
 
-        try {
-            CommonTerminal commonTerminal = new CommonTerminal(ShellType.ANDROID_SHELL);
-            commonTerminal.registerObserver(new LazyTerminalObserver() {
-                @Override
-                public void onMessage(String s) {
-                    runOnUiThread(() -> {
-                        System.out.print(s);
-                        Toast.makeText(MainActivity.this, s, Toast.LENGTH_SHORT).show();
-                    });
-                }
-            });
-            commonTerminal.input("ls");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            CommonTerminal commonTerminal = new CommonTerminal(ShellType.ANDROID_SHELL);
+//            commonTerminal.registerObserver(new LazyTerminalObserver() {
+//                @Override
+//                public void onMessage(String s) {
+//                    runOnUiThread(() -> {
+//                        System.out.print(s);
+//                        Toast.makeText(MainActivity.this, s, Toast.LENGTH_SHORT).show();
+//                    });
+//                }
+//            });
+//            commonTerminal.input("ls");
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
     }
 }

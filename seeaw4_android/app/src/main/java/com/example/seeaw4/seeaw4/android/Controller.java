@@ -7,8 +7,10 @@ import android.widget.ListView;
 
 import androidx.core.util.Consumer;
 
+import com.example.seeaw4.seeaw4.android.terminal.AndroidTerminal;
 import com.example.seeaw4.seeaw4.android.view.ClientView;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,12 +29,22 @@ public class Controller {
     public Controller(ListView listView) {
         this.listView = listView;
         client = new Client("192.168.43.242", 1999, false);
+        try {
+            client.setTerminal(new AndroidTerminal());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         client.init();
         client.setClientListChangeListener(this::renderList);
     }
 
     public Controller() {
         client = new Client("192.168.43.242", 1999, false);
+        try {
+            client.setTerminal(new AndroidTerminal());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         client.init();
         client.setClientListChangeListener(this::renderList);
     }
@@ -56,7 +68,7 @@ public class Controller {
                 byte[] camera = localPer.getTerminalProxy().getCamera().getCameraSnapshot(null, null);
                 clientView.post(()->{
 
-                    clientView.setCamera(camera);
+                    clientView.setCamera(screen);
                 });
             });
             clientView.setPer(localPer);

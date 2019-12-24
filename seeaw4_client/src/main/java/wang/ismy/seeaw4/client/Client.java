@@ -68,8 +68,20 @@ public class Client {
         this.port = port;
     }
 
+    /**
+     * 创建一个客户端
+     * @param ip
+     * @param port
+     * @param localTerminal 是否需要本地终端，如果为true，则会创建一个本地终端，否则不会创建一个mock终端
+     */
     public Client(String ip,int port,boolean localTerminal){
-        if (!localTerminal){
+        if (localTerminal){
+            try {
+                terminal = new CommonTerminal();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else{
             terminal = new MockTerminal();
         }
         terminalProxy = new TerminalProxy();
@@ -195,5 +207,9 @@ public class Client {
         terminal.close();
         // 直接退出虚拟机
         System.exit(0);
+    }
+
+    public void setTerminal(Terminal terminal){
+        this.terminal = terminal;
     }
 }
