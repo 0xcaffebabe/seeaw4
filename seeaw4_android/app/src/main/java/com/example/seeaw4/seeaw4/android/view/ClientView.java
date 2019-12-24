@@ -8,8 +8,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import androidx.annotation.Nullable;
 
 import com.example.seeaw4.seeaw4.android.R;
@@ -18,7 +16,7 @@ import com.example.seeaw4.seeaw4.android.activity.ShellActivity;
 
 import java.io.ByteArrayInputStream;
 import java.time.Instant;
-import java.time.LocalDate;
+
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.TimeZone;

@@ -109,6 +109,7 @@ public class Client {
     }
 
     public static void main(String[] args) throws IOException {
+
         Client client = new Client();
         client.init();
         client.terminalProxy.registerObserver(new LazyTerminalObserver() {

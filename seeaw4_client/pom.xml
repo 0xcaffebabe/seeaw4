@@ -44,7 +44,6 @@
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
                     <archive>
-
                         <manifest>
                             <mainClass>wang.ismy.seeaw4.client.Client</mainClass>
                         </manifest>
