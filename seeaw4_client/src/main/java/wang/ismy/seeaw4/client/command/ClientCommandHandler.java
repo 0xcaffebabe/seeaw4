@@ -21,6 +21,7 @@ import wang.ismy.seeaw4.terminal.observer.impl.LazyTerminalObserver;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -44,6 +45,8 @@ public class ClientCommandHandler implements CommandHandler {
         switch (commandMessage.getCommand()){
             case LIST_CLIENT:
                 return clientList(connection, commandMessage);
+            case SYS_INFO:
+                return systemInfo(connection,commandMessage);
             case SCREEN:
                 return screen(connection,commandMessage);
             case PHOTO:
@@ -79,6 +82,11 @@ public class ClientCommandHandler implements CommandHandler {
             default:
                 return null;
         }
+    }
+
+    private Message systemInfo(Connection connection, CommandMessage commandMessage) {
+        Map<String, Object> systemInfo = terminal.getSystemInfo();
+        return new TextMessage(JsonUtils.toJson(systemInfo));
     }
 
     private Message shellBind(Connection connection, CommandMessage commandMessage) {

@@ -1,5 +1,6 @@
 package wang.ismy.seeaw4.client.terminal;
 
+import com.google.gson.reflect.TypeToken;
 import lombok.extern.slf4j.Slf4j;
 import wang.ismy.seeaw4.client.ClientService;
 import wang.ismy.seeaw4.common.ExecuteService;
@@ -11,6 +12,7 @@ import wang.ismy.seeaw4.common.message.impl.ImgMessage;
 import wang.ismy.seeaw4.common.message.impl.TextMessage;
 import wang.ismy.seeaw4.common.promise.ConnectionPromise;
 import wang.ismy.seeaw4.common.utils.BytesUtils;
+import wang.ismy.seeaw4.common.utils.JsonUtils;
 import wang.ismy.seeaw4.terminal.Resolution;
 import wang.ismy.seeaw4.terminal.Terminal;
 import wang.ismy.seeaw4.terminal.TerminalBuffer;
@@ -21,7 +23,9 @@ import wang.ismy.seeaw4.terminal.enums.ImgType;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 
@@ -40,6 +44,7 @@ public class TerminalProxy extends Terminal {
     private String selfId;
     private Runnable bindSuccessListener;
     private ExecuteService executeService = ExecuteService.getInstance();
+    private Map<String,Object> systemInfo ;
 
     /**
      * 该构造器调用后会自动绑定
@@ -241,5 +246,35 @@ public class TerminalProxy extends Terminal {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * 远程调用获取远程系统信息
+     * @return 系统信息
+     */
+    @Override
+    public Map<String, Object> getSystemInfo() {
+        CommandMessage cmd = new CommandMessage();
+        cmd.setCommand(CommandType.SYS_INFO);
+        cmd.addAddition(CommandKey.PER_ID,remoteClientId);
+        final CountDownLatch latch = new CountDownLatch(1);
+        new ConnectionPromise(cmd)
+                .success((conn,msg)->{
+                    if (msg instanceof TextMessage){
+                        systemInfo = JsonUtils.fromJson(((TextMessage) msg).getText(),new TypeToken<Map<String,Object>>(){}.getType());
+                    }
+                    latch.countDown();
+                }).async();
+        try {
+            connection.sendMessage(cmd);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return systemInfo;
     }
 }

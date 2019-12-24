@@ -27,6 +27,12 @@
             <artifactId>webcam-capture</artifactId>
             <version>0.3.12</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.oshi</groupId>
+            <artifactId>oshi-core</artifactId>
+            <version>4.2.1</version>
+        </dependency>
+
 
     </dependencies>
 

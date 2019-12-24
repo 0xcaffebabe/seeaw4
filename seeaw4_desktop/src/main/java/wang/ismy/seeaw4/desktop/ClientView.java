@@ -1,5 +1,7 @@
 package wang.ismy.seeaw4.desktop;
 
+import com.jfoenix.controls.JFXListView;
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -17,6 +19,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.TimeZone;
 
@@ -32,6 +35,8 @@ public class ClientView extends HBox {
     private ImageView screen;
     @FXML
     private ImageView camera;
+    @FXML
+    private JFXListView<Label> listview;
 
     private LocalPer per;
 
@@ -80,6 +85,13 @@ public class ClientView extends HBox {
         if (per.isSelf()) {
             label.setStyle("-fx-background-color: red");
         }
+        Map<String,Object> map = per.getTerminalProxy().getSystemInfo();
+        Platform.runLater(()->{
+            listview.getItems().clear();
+            map.forEach((s,o)->{
+                listview.getItems().add(new Label(s+":"+o));
+            });
+        });
         label.setText(str);
     }
 

@@ -48,6 +48,11 @@ public enum CommandType {
     /**
      * 客户端接收到该消息，需要向终端输入命令
      */
-    SHELL_CMD()
+    SHELL_CMD(),
+
+    /**
+     * 客户端接收到该消息，回传系统信息
+     */
+    SYS_INFO()
     ;
 }

@@ -177,6 +177,10 @@ public class Client {
             localPerList.add(localPer);
         }
         System.out.println("本地客户端列表:"+localPerList);
+        // 获取所有客户端的系统信息
+        localPerList.forEach(p->{
+            System.out.println(p.getTerminalProxy().getSystemInfo());
+        });
         this.clientList = clientList;
         // 通知监听者
         if (listChangeListener != null){
