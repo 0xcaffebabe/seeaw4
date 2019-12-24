@@ -5,13 +5,14 @@
 
 <?import javafx.scene.image.ImageView?>
 <?import com.jfoenix.controls.JFXListView?>
-<fx:root type="javafx.scene.layout.HBox" xmlns:fx="http://javafx.com/fxml">
+<fx:root type="javafx.scene.layout.VBox" xmlns:fx="http://javafx.com/fxml">
 
-    <ImageView fx:id="screen" fitWidth="200" fitHeight="100"/>
-    <ImageView fx:id="camera" fitWidth="200" fitHeight="100"/>
-    <Label text="label2" fx:id="label"/>
-    <JFXListView fx:id="listview">
+        <HBox>
+            <JFXListView fx:id="listview"/>
+            <ImageView fx:id="screen" fitWidth="200" fitHeight="100"/>
+            <ImageView fx:id="camera" fitWidth="200" fitHeight="100"/>
+        </HBox>
+    <Label text="label2" fx:id="label" style="-fx-text-alignment: center"/>
 
-    </JFXListView>
 
 </fx:root>

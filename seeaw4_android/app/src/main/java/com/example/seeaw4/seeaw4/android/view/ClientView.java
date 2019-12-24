@@ -20,9 +20,11 @@ import java.io.ByteArrayInputStream;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.TimeZone;
 
 import wang.ismy.seeaw4.client.client.LocalPer;
+import wang.ismy.seeaw4.common.ExecuteService;
 
 public class ClientView extends LinearLayout {
 
@@ -85,6 +87,18 @@ public class ClientView extends LinearLayout {
         String id = per.getPer().getId();
         LocalDateTime localDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(per.getPer().getConnectTime()), TimeZone.getDefault().toZoneId());
         text.setText("ID:" + id + "\n连接时间:" + localDateTime.toString());
+        ExecuteService.excutes(()->{
+            Map<String, Object> info = per.getTerminalProxy().getSystemInfo();
+            String str = "\n";
+            for (String s : info.keySet()) {
+                str+=s+":"+info.get(s)+"\n";
+            }
+            String finalStr = str;
+            text.post(()->{
+
+                text.append(finalStr);
+            });
+        });
 
     }
 }

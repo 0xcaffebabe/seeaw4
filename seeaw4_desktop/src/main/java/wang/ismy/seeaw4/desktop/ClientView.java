@@ -11,7 +11,9 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import wang.ismy.seeaw4.client.client.LocalPer;
+import wang.ismy.seeaw4.common.ExecuteService;
 import wang.ismy.seeaw4.common.client.Per;
 import wang.ismy.seeaw4.common.utils.SwingUtils;
 
@@ -27,7 +29,7 @@ import java.util.TimeZone;
  * @author MY
  * @date 2019/12/21 14:48
  */
-public class ClientView extends HBox {
+public class ClientView extends VBox {
 
     @FXML
     private Label label;
@@ -37,6 +39,7 @@ public class ClientView extends HBox {
     private ImageView camera;
     @FXML
     private JFXListView<Label> listview;
+
 
     private LocalPer per;
 
@@ -82,14 +85,14 @@ public class ClientView extends HBox {
         this.per = per;
         String str = "ID:" + per.getId() + "\n" +
                 "连接时间:" + LocalDateTime.ofInstant(Instant.ofEpochMilli(per.getPer().getConnectTime()), TimeZone.getDefault().toZoneId());
-        if (per.isSelf()) {
-            label.setStyle("-fx-background-color: red");
-        }
-        Map<String,Object> map = per.getTerminalProxy().getSystemInfo();
-        Platform.runLater(()->{
-            listview.getItems().clear();
-            map.forEach((s,o)->{
-                listview.getItems().add(new Label(s+":"+o));
+        listview.getItems().clear();
+        ExecuteService.excutes(() -> {
+
+            Map<String, Object> info = per.getTerminalProxy().getSystemInfo();
+            info.forEach((s1,s2)->{
+                Platform.runLater(()->{
+                    listview.getItems().add(new Label(s1+":"+s2));
+                });
             });
         });
         label.setText(str);

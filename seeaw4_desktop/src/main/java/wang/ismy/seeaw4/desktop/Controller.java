@@ -55,6 +55,7 @@ public class Controller {
         System.out.println("client list render");
         Platform.runLater(() -> {
             listView.getItems().clear();
+
             List<LocalPer> localPerList = client.getLocalPerList();
             for (LocalPer per : localPerList) {
                 ClientView clientView = new ClientView();

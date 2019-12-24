@@ -68,7 +68,7 @@ public class Controller {
                 byte[] camera = localPer.getTerminalProxy().getCamera().getCameraSnapshot(null, null);
                 clientView.post(()->{
 
-                    clientView.setCamera(screen);
+                    clientView.setCamera(camera);
                 });
             });
             clientView.setPer(localPer);
