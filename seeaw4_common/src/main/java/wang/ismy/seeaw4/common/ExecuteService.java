@@ -8,7 +8,7 @@ import java.util.concurrent.Executors;
  */
 public class ExecuteService {
 
-    private ExecutorService executors = Executors.newFixedThreadPool(4);
+    private ExecutorService executors = Executors.newFixedThreadPool(16);
     private static ExecuteService executeService = new ExecuteService();
 
     public void excute(Runnable runnable){

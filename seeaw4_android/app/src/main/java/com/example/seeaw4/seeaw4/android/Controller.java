@@ -27,8 +27,9 @@ public class Controller {
     protected Client client;
 
     public Controller(ListView listView) {
+        System.setProperty("seeaw4.password","123321");
         this.listView = listView;
-        client = new Client("192.168.43.132", 1999, false);
+        client = new Client("100.64.137.37", 1999, false);
         try {
             client.setTerminal(new AndroidTerminal());
         } catch (IOException e) {

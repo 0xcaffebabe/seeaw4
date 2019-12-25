@@ -1,7 +1,5 @@
 package com.example.seeaw4.seeaw4.android.fragment;
 
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -12,13 +10,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ListAdapter;
+
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
-import android.widget.SimpleCursorAdapter;
 
 import com.example.seeaw4.seeaw4.android.Controller;
-import com.example.seeaw4.seeaw4.android.MainActivity;
 import com.example.seeaw4.seeaw4.android.R;
 import com.example.seeaw4.seeaw4.android.view.ClientView;
 
