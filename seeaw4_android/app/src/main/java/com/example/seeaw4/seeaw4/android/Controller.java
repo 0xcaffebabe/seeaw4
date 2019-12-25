@@ -28,7 +28,7 @@ public class Controller {
 
     public Controller(ListView listView) {
         this.listView = listView;
-        client = new Client("192.168.43.242", 1999, false);
+        client = new Client("192.168.43.132", 1999, false);
         try {
             client.setTerminal(new AndroidTerminal());
         } catch (IOException e) {
@@ -39,7 +39,7 @@ public class Controller {
     }
 
     public Controller() {
-        client = new Client("192.168.43.242", 1999, false);
+        client = new Client("192.168.43.132", 1999, false);
         try {
             client.setTerminal(new AndroidTerminal());
         } catch (IOException e) {

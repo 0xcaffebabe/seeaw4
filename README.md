@@ -28,13 +28,25 @@
 - [seeaw](https://github.com/0xcaffebabe/seeaw)
 - [seeaw3](https://github.com/0xcaffebabe/seeaw3-server-control)
 
+## 主要功能
+
+只要运行客户端，linux/win/mac/android都可以远程查看对方屏幕及摄像头还有一些系统信息
+并且都能获取对方的一个远程shell进行操作
+
+### 运行截图
+
+![](./asset/1.jpg)
+![](./asset/2.jpg)
+![](./asset/3.png)
+![](./asset/4.png)
+
 ## 模块
 
 - common
 
 一些通用类库以及一些接口定义
 
-- server
+- server(暂时不实现)
 
 服务端模块，负责处理客户端连接并能承受一定并发量，能独立打包运行部署
 
@@ -60,6 +72,14 @@
 
 ## 使用
 
+你可以在seeaw4_server下的NettyConnector.java修改监听端口
+
+```java
+ChannelFuture sync = serverBootstrap.bind(1999).sync();
+```
+
+客户端Client类创建可以传入ip与端口，默认使用本地地址
+
 执行构建
 
 ```shell script
@@ -71,6 +91,23 @@ mvn package
 ```shell script
 java -jar ./seeaw4_server/target/seeaw4_server-1.0-SNAPSHOT-jar-with-dependencies.jar
 ```
+
+控制台输出netty服务器启动成功则代表启动成功
+
+- 启动client
+
+```shell script
+java -jar ./seeaw4_client/target/seeaw4_client-1.0-SNAPSHOT-jar-with-dependencies.jar
+# 如果发现该终端到其他终端乱码，加上-Dfile,encoding=utf-8 参数
+```
+
+- 启动desktop端
+
+```shell script
+# 只能使用oracle jdk8 或 带有fx 的openjdk 启动 
+java -jar ./seeaw4_desktop/target/seeaw4_desktop-1.0-SNAPSHOT-jar-with-dependencies.jar
+```
+
 
 
 
