@@ -9,6 +9,7 @@ import wang.ismy.seeaw4.common.message.Message;
 import wang.ismy.seeaw4.common.message.MessageListener;
 import wang.ismy.seeaw4.common.message.MessageService;
 import wang.ismy.seeaw4.common.message.chain.impl.PrintMessageChain;
+import wang.ismy.seeaw4.server.service.AuthService;
 
 import java.lang.annotation.ElementType;
 import java.util.Arrays;
@@ -30,8 +31,17 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
     private MessageService messageService = MessageService.getInstance();
     private NettyConnectionService connectionService = NettyConnectionService.getInstance();
     private MessageListener messageListener;
+    private AuthService authService = AuthService.getInstance();
 
     private NettyServerHandler() { }
+
+    private void auth(Channel channel){
+        if (!authService.contains(channel)){
+            
+            throw new RuntimeException("channel 未认证");
+        }
+
+    }
 
     /**
      * 连接建立时调用
@@ -40,7 +50,9 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
      */
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-
+        if (true){
+            throw new RuntimeException("禁止通过");
+        }
         Channel channel = ctx.channel();
         log.info("连接到达:{}",channel.remoteAddress());
         channelList.add(channel);

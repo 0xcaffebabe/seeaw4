@@ -6,7 +6,6 @@
 <?import javafx.scene.image.ImageView?>
 <?import com.jfoenix.controls.JFXListView?>
 <fx:root type="javafx.scene.layout.VBox" xmlns:fx="http://javafx.com/fxml">
-
         <HBox>
             <JFXListView fx:id="listview"/>
             <ImageView fx:id="screen" fitWidth="200" fitHeight="100"/>
