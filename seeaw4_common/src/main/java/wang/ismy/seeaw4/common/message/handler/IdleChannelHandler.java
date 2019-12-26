@@ -15,10 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class IdleChannelHandler extends SimpleChannelInboundHandler {
 
-
-
-
-
     @Override
     protected void messageReceived(ChannelHandlerContext ctx, Object msg) throws Exception {
 
