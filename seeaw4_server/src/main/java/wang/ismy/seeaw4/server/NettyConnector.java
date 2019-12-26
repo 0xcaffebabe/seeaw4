@@ -79,7 +79,7 @@ public class NettyConnector implements Connector, ChannelListener, MessageListen
                                 channel.pipeline()
                                         .addLast("encoder",new SelfMessageEncoder())
                                         .addLast("decoder",new DelimiterBasedFrameDecoder(1024*1024,delimiter))
-                                        //.addLast(new IdleStateHandler(5,10,15, TimeUnit.SECONDS))
+                                        .addLast(new ServerIdleHandler(10,15,20, TimeUnit.SECONDS))
                                         .addLast(nettyServerHandler);
                             }
                         });
