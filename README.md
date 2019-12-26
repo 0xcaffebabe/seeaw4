@@ -35,10 +35,12 @@
 
 ### 运行截图
 
-![](./asset/1.jpg)
-![](./asset/2.jpg)
-![](./asset/3.png)
-![](./asset/4.png)
+
+
+![](./asset/1.png)
+![](./asset/2.png)
+![](./asset/3.jpg)
+![](./asset/4.jpg)
 
 ## 模块
 
@@ -110,7 +112,7 @@ java -jar ./seeaw4_desktop/target/seeaw4_desktop-1.0-SNAPSHOT-jar-with-dependenc
 
 - 安全认证
 
-server,client,desktop端启动都可以指定-Dseeaw4.password=password参数来配置密码，该密码用来对客户认证以及消息传输加密，客户端与客户端使用的密码都相同。
+server,client,desktop端启动都可以指定-Dseeaw4.password=password参数来配置密码，该密码用来对客户认证以及消息传输加密，客户端与服务端使用的密码都相同。
 
 android端，需要编程指定:
 

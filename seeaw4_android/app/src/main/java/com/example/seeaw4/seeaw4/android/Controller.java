@@ -35,7 +35,7 @@ public class Controller {
         // 指定密码
         PasswordService.update("password");
         this.listView = listView;
-        client = new Client("192.168.43.132", 1999, false);
+        client = new Client("127.0.0.1", 1999, false);
         client.setConnectionStateChangeListener(listener);
         try {
             client.setTerminal(new AndroidTerminal());
@@ -47,7 +47,7 @@ public class Controller {
     }
 
     public Controller() {
-        client = new Client("192.168.43.132", 1999, false);
+        client = new Client("127.0.0.1", 1999, false);
         try {
             client.setTerminal(new AndroidTerminal());
         } catch (IOException e) {
