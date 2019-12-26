@@ -20,4 +20,9 @@ public class ExecuteServiceTest {
         ExecuteService service = ExecuteService.getInstance();
         assertNotNull(service);
     }
+
+    @Test
+    public void testSchedule(){
+
+    }
 }

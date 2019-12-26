@@ -108,6 +108,15 @@ java -jar ./seeaw4_client/target/seeaw4_client-1.0-SNAPSHOT-jar-with-dependencie
 java -jar ./seeaw4_desktop/target/seeaw4_desktop-1.0-SNAPSHOT-jar-with-dependencies.jar
 ```
 
+- 安全认证
+
+server,client,desktop端启动都可以指定-Dseeaw4.password=password参数来配置密码，该密码用来对客户认证以及消息传输加密，客户端与客户端使用的密码都相同。
+
+android端，需要编程指定:
+
+```java
+PasswordService.update("password");
+```
 
 
 

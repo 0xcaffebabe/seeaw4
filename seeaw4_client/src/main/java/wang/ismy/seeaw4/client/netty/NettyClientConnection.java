@@ -6,25 +6,20 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import lombok.extern.slf4j.Slf4j;
-import wang.ismy.seeaw4.common.connection.ConnectionListener;
+import wang.ismy.seeaw4.common.ExecuteService;
+import wang.ismy.seeaw4.common.connection.*;
 import wang.ismy.seeaw4.common.message.Message;
-import wang.ismy.seeaw4.common.connection.Connection;
-import wang.ismy.seeaw4.common.connection.ConnectionInfo;
 import wang.ismy.seeaw4.common.message.MessageListener;
 import wang.ismy.seeaw4.common.message.MessageService;
 import wang.ismy.seeaw4.common.message.SelfMessageEncoder;
-import wang.ismy.seeaw4.common.message.chain.impl.PrintMessageChain;
 import wang.ismy.seeaw4.common.message.handler.IdleChannelHandler;
-import wang.ismy.seeaw4.common.message.impl.TextMessage;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -45,6 +40,8 @@ public class NettyClientConnection implements Connection {
     private final MessageService messageService = MessageService.getInstance();
     private NioEventLoopGroup group;
     private ConnectionListener connectionListener;
+    private IdleChannelHandler idleHandler = new IdleChannelHandler(5, 5, 15, TimeUnit.SECONDS);;
+    private ConnectionStateChangeListener stateChangeListener;
 
     public NettyClientConnection(String ip, int port) {
         nettyClientHandler = new NettyClientHandler(this);
@@ -55,6 +52,7 @@ public class NettyClientConnection implements Connection {
     public void connect() {
         group = new NioEventLoopGroup();
         Bootstrap bootstrap = new Bootstrap();
+
         bootstrap.group(group)
                 .channel(NioSocketChannel.class)
                 .handler(new ChannelInitializer<SocketChannel>() {
@@ -63,8 +61,9 @@ public class NettyClientConnection implements Connection {
                         ByteBuf delimiter = Unpooled.copiedBuffer("$_0xca".getBytes());
 
                         ch.pipeline()
-                                .addLast("encoder",new SelfMessageEncoder())
-                                .addLast("decoder",new DelimiterBasedFrameDecoder(1024*1024,delimiter))
+                                .addLast("encoder", new SelfMessageEncoder())
+                                .addLast("decoder", new DelimiterBasedFrameDecoder(1024 * 1024, delimiter))
+                                .addLast(idleHandler)
                                 .addLast(nettyClientHandler);
                     }
                 });
@@ -74,11 +73,14 @@ public class NettyClientConnection implements Connection {
         future.addListener((ChannelFuture f) -> {
             if (!f.isSuccess()) {
                 f.channel().eventLoop().schedule(() -> {
+                    ExecuteService.excutes(()->{
+                        stateChangeListener.onChange(this,ConnectionState.DEAD);
+                    });
                     log.info("连接不上服务器,{}ms后重试", NEXT_RETRY_DELAY);
                     connect();
                 }, NEXT_RETRY_DELAY, TimeUnit.MILLISECONDS);
-            }else {
-                connectionInfo = new ConnectionInfo(channel.remoteAddress(),System.currentTimeMillis());
+            } else {
+                connectionInfo = new ConnectionInfo(channel.remoteAddress(), System.currentTimeMillis());
             }
         });
     }
@@ -111,23 +113,35 @@ public class NettyClientConnection implements Connection {
         Message message = messageService.resolve(buf.readBytes(buf.readableBytes()).array());
         messageService.process(this, message);
         // 通知监听者
-        if (messageListener != null){
-            messageListener.onMessage(this,message);
+        if (messageListener != null) {
+            messageListener.onMessage(this, message);
         }
     }
 
     @Override
     public void active() {
-        if (connectionListener != null){
+        if (connectionListener != null) {
             connectionListener.establish(this);
         }
+        ExecuteService.excutes(()->{
+            if (stateChangeListener != null){
+                stateChangeListener.onChange(this, ConnectionState.LIVE);
+            }
+        });
+
     }
 
     @Override
     public void inActive() {
-        if (connectionListener != null){
+        if (connectionListener != null) {
             connectionListener.close(this);
         }
+        ExecuteService.excutes(()->{
+            if (stateChangeListener != null){
+                stateChangeListener.onChange(this, ConnectionState.DEAD);
+            }
+        });
+
     }
 
     @Override
@@ -142,4 +156,11 @@ public class NettyClientConnection implements Connection {
                 ", port=" + port +
                 '}';
     }
+
+    @Override
+    public void bindConnectionStateChangeListener(ConnectionStateChangeListener listener) {
+        this.stateChangeListener = listener;
+        idleHandler.setConnectionStateChangeListener(listener);
+    }
+
 }

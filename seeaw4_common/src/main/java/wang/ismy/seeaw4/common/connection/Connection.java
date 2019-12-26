@@ -56,4 +56,8 @@ public interface Connection extends AutoCloseable{
 	default void bindConnectionListener(ConnectionListener listener){
 
 	}
+
+	default void bindConnectionStateChangeListener(ConnectionStateChangeListener listener){
+
+	}
 }

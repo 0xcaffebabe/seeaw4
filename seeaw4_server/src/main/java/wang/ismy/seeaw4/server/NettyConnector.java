@@ -29,6 +29,7 @@ import wang.ismy.seeaw4.common.message.impl.CommandMessage;
 import wang.ismy.seeaw4.common.utils.JsonUtils;
 import wang.ismy.seeaw4.server.message.chain.ServerMessageChain;
 import wang.ismy.seeaw4.server.netty.*;
+import wang.ismy.seeaw4.server.service.AuthService;
 
 import java.io.IOException;
 import java.util.List;
@@ -47,7 +48,7 @@ public class NettyConnector implements Connector, ChannelListener, MessageListen
     private NettyServerHandler nettyServerHandler = NettyServerHandler.getInstance();
     private NettyConnectionService nettyConnectionService = NettyConnectionService.getInstance();
     private MessageService messageService = MessageService.getInstance();
-
+    private AuthService authService = AuthService.getInstance();
 
     public NettyConnector() {
         // 监听handler的连接建立与关闭
@@ -78,7 +79,7 @@ public class NettyConnector implements Connector, ChannelListener, MessageListen
                                 channel.pipeline()
                                         .addLast("encoder",new SelfMessageEncoder())
                                         .addLast("decoder",new DelimiterBasedFrameDecoder(1024*1024,delimiter))
-                                        .addLast(new IdleStateHandler(5,10,15, TimeUnit.SECONDS))
+                                        //.addLast(new IdleStateHandler(5,10,15, TimeUnit.SECONDS))
                                         .addLast(nettyServerHandler);
                             }
                         });
@@ -134,9 +135,15 @@ public class NettyConnector implements Connector, ChannelListener, MessageListen
     }
 
     private void broadcast() {
+
         executeService.excute(()->{
 
             for (Connection conn : getConnectionList()) {
+                Channel channel = nettyConnectionService.get(conn);
+                // 不向还未认证的客户发送消息
+                if (!authService.contains(channel)){
+                    continue;
+                }
                 List<Per> collect = nettyConnectionService.getConnectionList().stream()
                         .map(c -> {
                             Per p = Per.convert(c);

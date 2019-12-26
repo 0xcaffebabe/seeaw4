@@ -18,6 +18,11 @@ import wang.ismy.seeaw4.client.Client;
 import wang.ismy.seeaw4.client.client.LocalPer;
 import wang.ismy.seeaw4.common.ExecuteService;
 import wang.ismy.seeaw4.common.client.Per;
+import wang.ismy.seeaw4.common.connection.Connection;
+import wang.ismy.seeaw4.common.connection.ConnectionState;
+import wang.ismy.seeaw4.common.connection.ConnectionStateChangeListener;
+import wang.ismy.seeaw4.common.encrypt.PasswordService;
+import wang.ismy.seeaw4.common.message.MessageService;
 import wang.ismy.seeaw4.terminal.observer.impl.LazyTerminalObserver;
 
 public class Controller {
@@ -26,9 +31,12 @@ public class Controller {
 
     protected Client client;
 
-    public Controller(ListView listView) {
+    public Controller(ListView listView,ConnectionStateChangeListener listener) {
+        // 指定密码
+        PasswordService.update("password");
         this.listView = listView;
-        client = new Client("192.168.43.132", 1999, false);
+        client = new Client("192.168.43.242", 1999, false);
+        client.setConnectionStateChangeListener(listener);
         try {
             client.setTerminal(new AndroidTerminal());
         } catch (IOException e) {
@@ -58,15 +66,15 @@ public class Controller {
 
 
             ClientView clientView = new ClientView(listView.getContext(), null);
-            ExecuteService.excutes(()->{
+            ExecuteService.excutes(() -> {
 
                 byte[] screen = localPer.getTerminalProxy().getDesktop().getScreen(null, null);
-                clientView.post(()->{
+                clientView.post(() -> {
 
                     clientView.setScreen(screen);
                 });
                 byte[] camera = localPer.getTerminalProxy().getCamera().getCameraSnapshot(null, null);
-                clientView.post(()->{
+                clientView.post(() -> {
 
                     clientView.setCamera(camera);
                 });

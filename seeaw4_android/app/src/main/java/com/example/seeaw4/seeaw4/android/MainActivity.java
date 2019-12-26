@@ -30,10 +30,13 @@ import wang.ismy.seeaw4.terminal.observer.impl.LazyTerminalObserver;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static MainActivity instance ;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        instance = this;
         final TabLayout tabLayout = findViewById(R.id.tab_layout);
         ViewPager viewPager = findViewById(R.id.view_pager);
 

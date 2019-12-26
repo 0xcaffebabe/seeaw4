@@ -1,23 +1,31 @@
 package wang.ismy.seeaw4.desktop;
 
 import com.jfoenix.controls.JFXListView;
+import com.jfoenix.controls.JFXTabPane;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import wang.ismy.seeaw4.client.Client;
 import wang.ismy.seeaw4.client.client.LocalPer;
 import wang.ismy.seeaw4.client.terminal.TerminalProxy;
 import wang.ismy.seeaw4.common.ExecuteService;
 import wang.ismy.seeaw4.common.client.Per;
+import wang.ismy.seeaw4.common.connection.Connection;
+import wang.ismy.seeaw4.common.connection.ConnectionListener;
+import wang.ismy.seeaw4.common.connection.ConnectionState;
 import wang.ismy.seeaw4.terminal.camera.Camera;
 import wang.ismy.seeaw4.terminal.desktop.Desktop;
 import wang.ismy.seeaw4.terminal.observer.impl.LazyTerminalObserver;
 
+import javax.swing.plaf.nimbus.State;
+import java.awt.*;
 import java.io.ByteArrayInputStream;
 import java.net.URL;
 import java.util.List;
@@ -41,13 +49,16 @@ public class Controller {
 
     public Controller() {
         client = new Client();
-        client.getTerminalProxy().registerObserver(new LazyTerminalObserver() {
-            @Override
-            public void onMessage(String msg) {
-                System.err.print(msg);
-            }
-        });
         client.setClientListChangeListener(this::renderClientList);
+        client.setConnectionStateChangeListener((conn, state) -> {
+            Platform.runLater(() -> {
+                if (state.equals(ConnectionState.LIVE)) {
+                    ((Stage) ap.getScene().getWindow()).setTitle("连接服务器正常");
+                } else {
+                    ((Stage) ap.getScene().getWindow()).setTitle("连接服务器超时");
+                }
+            });
+        });
         client.init();
     }
 
@@ -61,14 +72,14 @@ public class Controller {
                 ClientView clientView = new ClientView();
                 clientView.setClient(per);
                 // 显示画面
-                executeService.excute(()->{
+                executeService.excute(() -> {
                     TerminalProxy terminalProxy = per.getTerminalProxy();
                     if (terminalProxy != null) {
                         Desktop desktop = terminalProxy.getDesktop();
                         Camera camera = terminalProxy.getCamera();
                         byte[] screenBytes = desktop.getScreen(null, null);
                         byte[] cameraBytes = camera.getCameraSnapshot(null, null);
-                        Platform.runLater(()->{
+                        Platform.runLater(() -> {
                             clientView.setScreen(new Image(new ByteArrayInputStream(screenBytes)));
                             clientView.setCamera(new Image(new ByteArrayInputStream(cameraBytes)));
                         });
@@ -80,9 +91,9 @@ public class Controller {
 
     }
 
-    public void shutdown(){
+    public void shutdown() {
         System.out.println("client close");
-        if (client != null){
+        if (client != null) {
             client.close();
         }
     }

@@ -17,7 +17,6 @@
         </Tab>
         <Tab text="系统日志">
             <ClientView/>
-<!--            <Label text="系统日志"/>-->
         </Tab>
 
     </JFXTabPane>

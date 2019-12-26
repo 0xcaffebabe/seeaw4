@@ -21,7 +21,17 @@ public enum MessageType {
      */
     IMG(1,MessageConverterFactory.imgMessageConverter()),
 
-    COMMAND(2,MessageConverterFactory.commandMessageConverter());
+    COMMAND(2,MessageConverterFactory.commandMessageConverter()),
+
+
+    /**
+     * 认证消息
+     */
+    AUTH(3,MessageConverterFactory.authMessageConverter()),
+
+    HEART_BEAT(4,MessageConverterFactory.heartBeatMessage())
+    ;
+
 
     private int code;
     private MessageConverter messageConverter;
