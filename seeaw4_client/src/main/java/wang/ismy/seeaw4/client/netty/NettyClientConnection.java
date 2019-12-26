@@ -18,6 +18,7 @@ import wang.ismy.seeaw4.common.message.MessageListener;
 import wang.ismy.seeaw4.common.message.MessageService;
 import wang.ismy.seeaw4.common.message.SelfMessageEncoder;
 import wang.ismy.seeaw4.common.message.handler.IdleChannelHandler;
+import wang.ismy.seeaw4.common.message.impl.HeartBeatMessage;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -40,13 +41,22 @@ public class NettyClientConnection implements Connection {
     private final MessageService messageService = MessageService.getInstance();
     private NioEventLoopGroup group;
     private ConnectionListener connectionListener;
-    private IdleChannelHandler idleHandler = new IdleChannelHandler(5, 5, 15, TimeUnit.SECONDS);;
+    private IdleChannelHandler idleHandler = new IdleChannelHandler(5, 5, 15, TimeUnit.SECONDS);
+    ;
     private ConnectionStateChangeListener stateChangeListener;
 
     public NettyClientConnection(String ip, int port) {
         nettyClientHandler = new NettyClientHandler(this);
         this.ip = ip;
         this.port = port;
+        ExecuteService.schedule(() -> {
+            log.info("心跳发送");
+            try {
+                sendMessage(new HeartBeatMessage());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }, 10);
     }
 
     public void connect() {
@@ -73,8 +83,8 @@ public class NettyClientConnection implements Connection {
         future.addListener((ChannelFuture f) -> {
             if (!f.isSuccess()) {
                 f.channel().eventLoop().schedule(() -> {
-                    ExecuteService.excutes(()->{
-                        stateChangeListener.onChange(this,ConnectionState.DEAD);
+                    ExecuteService.excutes(() -> {
+                        stateChangeListener.onChange(this, ConnectionState.DEAD);
                     });
                     log.info("连接不上服务器,{}ms后重试", NEXT_RETRY_DELAY);
                     connect();
@@ -123,8 +133,8 @@ public class NettyClientConnection implements Connection {
         if (connectionListener != null) {
             connectionListener.establish(this);
         }
-        ExecuteService.excutes(()->{
-            if (stateChangeListener != null){
+        ExecuteService.excutes(() -> {
+            if (stateChangeListener != null) {
                 stateChangeListener.onChange(this, ConnectionState.LIVE);
             }
         });
@@ -136,8 +146,8 @@ public class NettyClientConnection implements Connection {
         if (connectionListener != null) {
             connectionListener.close(this);
         }
-        ExecuteService.excutes(()->{
-            if (stateChangeListener != null){
+        ExecuteService.excutes(() -> {
+            if (stateChangeListener != null) {
                 stateChangeListener.onChange(this, ConnectionState.DEAD);
             }
         });

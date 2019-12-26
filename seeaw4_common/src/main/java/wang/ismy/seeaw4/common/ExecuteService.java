@@ -35,6 +35,6 @@ public class ExecuteService {
     }
 
     public static void schedule(Runnable runnable,int interval){
-        executeService.scheduledExecutorService.scheduleAtFixedRate(runnable,0,interval, TimeUnit.SECONDS);
+        executeService.scheduledExecutorService.scheduleAtFixedRate(runnable,10,interval, TimeUnit.SECONDS);
     }
 }

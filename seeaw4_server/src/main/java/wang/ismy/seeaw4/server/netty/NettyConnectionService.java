@@ -28,15 +28,15 @@ public class NettyConnectionService {
 
     private NettyConnectionService() {
         // 每隔10秒，向所有连接发送一条心跳
-        ExecuteService.schedule(()->{
-            for (Connection connection : getConnectionList()) {
-                try {
-                    connection.sendMessage(new HeartBeatMessage());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        },10);
+//        ExecuteService.schedule(()->{
+//            for (Connection connection : getConnectionList()) {
+//                try {
+//                    connection.sendMessage(new HeartBeatMessage());
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        },10);
     }
 
     public void add(Channel channel, Connection connection){
@@ -60,6 +60,7 @@ public class NettyConnectionService {
         Connection connection = channelConnectionMap.get(channel);
         channelConnectionMap.remove(channel);
         connectionChannelMap.remove(connection);
+        broadcast();
         return connection;
     }
 
@@ -67,6 +68,7 @@ public class NettyConnectionService {
         Channel channel = connectionChannelMap.get(connection);
         connectionChannelMap.remove(connection);
         channelConnectionMap.remove(channel);
+        broadcast();
         return channel;
     }
 
