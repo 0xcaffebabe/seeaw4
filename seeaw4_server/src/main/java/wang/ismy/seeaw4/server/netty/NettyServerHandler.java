@@ -5,6 +5,7 @@ import io.netty.channel.*;
 import io.netty.util.CharsetUtil;
 import lombok.extern.slf4j.Slf4j;
 import wang.ismy.seeaw4.common.connection.Connection;
+import wang.ismy.seeaw4.common.encrypt.PasswordService;
 import wang.ismy.seeaw4.common.message.Message;
 import wang.ismy.seeaw4.common.message.MessageListener;
 import wang.ismy.seeaw4.common.message.MessageService;
@@ -36,7 +37,6 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
     private NettyConnectionService connectionService = NettyConnectionService.getInstance();
     private MessageListener messageListener;
     private AuthService authService = AuthService.getInstance();
-    private String password = System.getProperty("seeaw4.password") != null ? System.getProperty("seeaw4.password") : "password";
 
     private NettyServerHandler() {
     }
@@ -101,8 +101,11 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
         // 通知监听者
         if (messageListener != null) {
+
             messageListener.onMessage(connectionService.get(channel), message);
+
         }
+
     }
 
     public static NettyServerHandler getInstance() {
@@ -125,7 +128,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
         // 判断消息类型是否是认证消息
         if (msg instanceof AuthMessage) {
             // 如果密码正确，则将其加入已认证连接列表
-            if (password.equals(((AuthMessage) msg).getPassword())) {
+            if (PasswordService.get().equals(((AuthMessage) msg).getPassword())) {
                 authService.add(channel);
                 // 认证成功后，向该连接发送在线客户端列表
                 log.info("{}认证成功，发送在线客户列表", channel);

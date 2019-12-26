@@ -18,6 +18,8 @@ import wang.ismy.seeaw4.client.Client;
 import wang.ismy.seeaw4.client.client.LocalPer;
 import wang.ismy.seeaw4.common.ExecuteService;
 import wang.ismy.seeaw4.common.client.Per;
+import wang.ismy.seeaw4.common.encrypt.PasswordService;
+import wang.ismy.seeaw4.common.message.MessageService;
 import wang.ismy.seeaw4.terminal.observer.impl.LazyTerminalObserver;
 
 public class Controller {
@@ -27,7 +29,8 @@ public class Controller {
     protected Client client;
 
     public Controller(ListView listView) {
-        System.setProperty("seeaw4.password","123321");
+        // 指定密码
+        PasswordService.update("123321");
         this.listView = listView;
         client = new Client("100.64.137.37", 1999, false);
         try {

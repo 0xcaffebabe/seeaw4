@@ -1,5 +1,6 @@
 package wang.ismy.seeaw4.client.netty;
 
+import ch.qos.logback.core.util.TimeUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -65,6 +66,7 @@ public class NettyClientConnection implements Connection {
                         ch.pipeline()
                                 .addLast("encoder",new SelfMessageEncoder())
                                 .addLast("decoder",new DelimiterBasedFrameDecoder(1024*1024,delimiter))
+                                .addLast(new IdleChannelHandler(5,5,15, TimeUnit.SECONDS))
                                 .addLast(nettyClientHandler);
                     }
                 });

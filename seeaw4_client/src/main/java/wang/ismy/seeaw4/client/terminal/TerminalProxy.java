@@ -261,6 +261,7 @@ public class TerminalProxy extends Terminal {
         new ConnectionPromise(cmd)
                 .success((conn,msg)->{
                     if (msg instanceof TextMessage){
+
                         systemInfo = JsonUtils.fromJson(((TextMessage) msg).getText(),new TypeToken<Map<String,Object>>(){}.getType());
                     }
                     latch.countDown();

@@ -12,6 +12,7 @@ import wang.ismy.seeaw4.common.ExecuteService;
 import wang.ismy.seeaw4.common.client.Per;
 import wang.ismy.seeaw4.common.connection.Connection;
 import wang.ismy.seeaw4.common.connection.ConnectionListener;
+import wang.ismy.seeaw4.common.encrypt.PasswordService;
 import wang.ismy.seeaw4.common.message.MessageService;
 import wang.ismy.seeaw4.common.message.chain.impl.PrintMessageChain;
 import wang.ismy.seeaw4.common.message.chain.impl.PromiseMessageChain;
@@ -46,7 +47,6 @@ public class Client {
     private String selfId;
     private String ip;
     private int port;
-    private String password = System.getProperty("seeaw4.password") != null ? System.getProperty("seeaw4.password") : "password";
 
     public Client() {
         // 创建一个本地终端
@@ -100,7 +100,7 @@ public class Client {
             public void establish(Connection connection) {
                 // 连接建立的时候向服务器发送一条认证消息
                 AuthMessage auth = new AuthMessage();
-                auth.addAddition("password", password);
+                auth.addAddition("password", PasswordService.get());
                 try {
                     connection.sendMessage(auth);
                 } catch (IOException e) {

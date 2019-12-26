@@ -2,6 +2,8 @@ package com.example.seeaw4.seeaw4.android;
 
 import org.junit.Test;
 
+import wang.ismy.seeaw4.common.message.MessageService;
+
 import static org.junit.Assert.*;
 
 /**
@@ -14,4 +16,6 @@ public class ExampleUnitTest {
     public void addition_isCorrect() {
         assertEquals(4, 2 + 2);
     }
+
+
 }
