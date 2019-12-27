@@ -9,6 +9,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TabHost;
@@ -59,5 +60,14 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.getTabAt(0).setText("在线用户");
         tabLayout.getTabAt(1).setText("系统日志");
 
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK){
+            System.exit(0);
+            return true;
+        }
+        return false;
     }
 }

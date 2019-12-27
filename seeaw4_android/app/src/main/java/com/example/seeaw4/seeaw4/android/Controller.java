@@ -33,9 +33,9 @@ public class Controller {
 
     public Controller(ListView listView,ConnectionStateChangeListener listener) {
         // 指定密码
-        PasswordService.update("password");
+        PasswordService.update("715711877sss");
         this.listView = listView;
-        client = new Client("127.0.0.1", 1999, false);
+        client = new Client("zbq.ismy.wang", 1999, false);
         client.setConnectionStateChangeListener(listener);
         try {
             client.setTerminal(new AndroidTerminal());

@@ -131,7 +131,7 @@ public class Client {
     }
 
     public static void main(String[] args) throws IOException {
-        Client client = new Client();
+        Client client = new Client("zbq.ismy.wang",1999);
         client.init();
         client.terminalProxy.registerObserver(new LazyTerminalObserver() {
             @Override
